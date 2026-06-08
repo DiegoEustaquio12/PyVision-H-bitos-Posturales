@@ -2,13 +2,11 @@ import os
 import math
 import urllib.request
 from collections import deque
-
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
-# La API moderna de MediaPipe Tasks requiere el modelo físico (.task) en el equipo.
 MODEL_PATH = "pose_landmarker_full.task"
 MODEL_URL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task"
 
@@ -17,26 +15,24 @@ if not os.path.exists(MODEL_PATH):
     urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 # Postura
-# Tolerancias para vista frontal. Ajustar según la fisionomía del usuario objetivo.
 MAX_INCLINACION_CABEZA  = 15.0  # Grados máximos permitidos de ladeo (oreja a oreja)
 MAX_DESNIVEL_HOMBROS    = 10.0  # Grados máximos permitidos de desnivel (hombro a hombro)
 MIN_RATIO_ENCORVAMIENTO = 0.42  # Relación mínima (altura cuello / ancho hombros)
 MIN_RATIO_APERTURA      = 1.95  # Relación mínima (ancho hombros / ancho cabeza) para evitar colapso de pecho
 
-# Compensación geométrica: Sube el punto base de los hombros un % respecto al ancho de la cabeza
+
 OFFSET_SUPERIOR_HOMBRO  = 0.30  
 
 # Suavizado de movimiento 
 TAMANO_BUFFER = 5
 
-# Paleta de colores 
+# colores rgb
 COLOR_CORRECTO   = (40, 220, 100)  # Verde
 COLOR_INCORRECTO = (50, 50, 240)   # Rojo
 BLANCO           = (255, 255, 255)
 AMARILLO         = (0, 230, 230)
 OSCURO           = (20, 20, 20)
 
-# Índices del esqueleto de MediaPipe
 IDX_NARIZ = 0
 IDX_OREJA_IZQ = 7; IDX_OREJA_DER = 8
 IDX_HOMB_IZQ = 11; IDX_HOMB_DER = 12
@@ -55,7 +51,7 @@ def calcular_inclinacion(p1: tuple, p2: tuple) -> float:
     return abs(math.degrees(math.atan(dy / dx)))
 
 def calcular_distancia(p1: tuple, p2: tuple) -> float:
-    """Retorna la distancia euclidiana en píxeles entre dos puntos bidimensionales."""
+    """Retorna la distancia en píxeles entre dos puntos bidimensionales."""
     return math.hypot(p2[0] - p1[0], p2[1] - p1[1])
 
 def obtener_punto_medio(p1: tuple, p2: tuple) -> tuple:
@@ -63,7 +59,7 @@ def obtener_punto_medio(p1: tuple, p2: tuple) -> tuple:
     return (int((p1[0] + p2[0]) / 2), int((p1[1] + p2[1]) / 2))
 
 def normalizar_a_pixeles(landmark, ancho: int, alto: int) -> tuple:
-    """Convierte las coordenadas relativas de MediaPipe (0.0 a 1.0) a píxeles absolutos del frame."""
+    """Convierte las coordenadas relativas de MediaPipe a píxeles absolutos del frame."""
     return (int(landmark.x * ancho), int(landmark.y * alto))
 
 def aplicar_suavizado(punto: tuple, buffer: deque) -> tuple:
@@ -77,7 +73,6 @@ def aplicar_suavizado(punto: tuple, buffer: deque) -> tuple:
 
 
 def main():
-    # Configuración de rendimiento: Modo IMAGE procesa lo más rápido posible sin encolar frames
     opciones_vision = vision.PoseLandmarkerOptions(
         base_options=python.BaseOptions(model_asset_path=MODEL_PATH),
         running_mode=vision.RunningMode.IMAGE,
@@ -93,7 +88,7 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
     cap.set(cv2.CAP_PROP_FPS, 30) 
 
-    print("[INFO] Módulo de Visión Postural inicializado. Presiona 'q' en la ventana para salir.")
+    print("Módulo de Visión de postura inicializado. Presiona 'q' en la ventana para salir.")
 
     with vision.PoseLandmarker.create_from_options(opciones_vision) as landmarker:
         while True:
@@ -189,7 +184,7 @@ def main():
             cv2.putText(frame, f"Apertura Pecho: {ratio_apertura:.2f} (Min {MIN_RATIO_APERTURA})", (25, 125), fuente, 0.5, BLANCO, 1)
             cv2.putText(frame, estado_texto, (25, 155), fuente, 0.6, color_estado, 2)
 
-            cv2.imshow("PyVision - Módulo de Control Postural", frame)
+            cv2.imshow("PyVision - detector de postura", frame)
             
             # salir con la q
             if cv2.waitKey(1) & 0xFF == ord("q"):
