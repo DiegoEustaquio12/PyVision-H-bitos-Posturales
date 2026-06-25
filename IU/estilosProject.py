@@ -2,7 +2,7 @@ from PySide6.QtGui import QImage
 
 estilo1 = '''
     #main {
-    background: transparent;;
+    background: transparent;
     }
 
     QFrame {
@@ -24,6 +24,10 @@ estilo1 = '''
     
     }
     
+    #frameInterno {
+    background-color: #393a41;
+    border-radius: 35px;
+    }    
 
 
   
@@ -34,7 +38,7 @@ imagenes = '''
     background-color: #202123;
     border: transparent;
     };
-    }
+    
 '''
 
 buttonSide = '''
@@ -59,4 +63,54 @@ buttonSide = '''
    
     }
 
+'''
+
+
+estado1 ="""
+    background-color: #213028;      
+    color: white; 
+    font-size: 35px;     
+    font-weight: bold;
+    border-radius: 20px;              
+    padding: 5px;                    
+"""
+racha ="""
+    background-color: #2b2d31;      
+    color: white; 
+    font-size: 25px;     
+    font-weight: bold;
+    border-radius: 11px;              
+    padding: 10px;                    
+"""
+contadores = '''
+           
+           QLabel {
+
+            font-size: 20px;     
+         
+            border: transparent;
+            font-family: Inter;                            
+            background-color: Transparent;
+         
+            
+                }
+ '''
+contador1 = contadores + '''
+QLabel {
+color: #00897b;            
+                }
+'''
+
+contador2 = contadores + '''
+QLabel {
+color: #ff8484;            
+                }
+'''
+
+contador3 = contadores + '''
+QLabel {
+color: white;
+font-weight: normal;   
+font-size: 16px;         
+                }
 '''
