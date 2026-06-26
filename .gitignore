@@ -12,3 +12,6 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+# Bases de datos locales
+*.db
