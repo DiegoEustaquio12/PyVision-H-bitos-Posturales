@@ -260,8 +260,11 @@ def dibujar_hud_metricas(
 
 
 def main():
+    with open(MODEL_PATH, "rb") as f:
+        model_data = f.read()
+
     opciones_vision = vision.PoseLandmarkerOptions(
-        base_options=python.BaseOptions(model_asset_path=MODEL_PATH),
+        base_options=python.BaseOptions(model_asset_buffer=model_data),
         running_mode=vision.RunningMode.IMAGE,
         min_pose_detection_confidence=0.5,
         min_pose_presence_confidence=0.5,
