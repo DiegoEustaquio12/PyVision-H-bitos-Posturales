@@ -67,11 +67,19 @@ buttonSide = '''
 
 
 estado1 ="""
-    background-color: #213028;      
+    background-color: #056d38;      
     color: white; 
     font-size: 35px;     
     font-weight: bold;
     border-radius: 20px;              
+    padding: 5px;                    
+"""
+modo1 ="""
+    background-color: #393a41;      
+    color: white; 
+    font-size: 20px;     
+    font-weight: bold;
+    border-radius: 14px;              
     padding: 5px;                    
 """
 racha ="""

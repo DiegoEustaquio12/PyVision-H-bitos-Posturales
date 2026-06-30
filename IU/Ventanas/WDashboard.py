@@ -1,6 +1,8 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton
+from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QCheckBox
 from IU.estilosProject import *
+from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
+from IU.Ventanas.Widgets.targetaTarea import tareaTarget
 
 class WidDashboard(QWidget):
     def __init__(self):
@@ -86,8 +88,14 @@ class WidDashboard(QWidget):
         scrollTareas = QScrollArea()
         contenidoScroll = QWidget()
         contenidoLayout = QVBoxLayout(contenidoScroll)
+
+
+        targetas = tareaTarget()
         for i in range(30):
             contenidoLayout.addWidget(QLabel(f"tarea {i+1} "))
+
+        contenidoLayout.addWidget(targetas)
+
         scrollTareas.setWidget(contenidoScroll)
         scrollTareas.setWidgetResizable(True)
 
@@ -107,6 +115,36 @@ class WidDashboard(QWidget):
 
 
         frame_prefs = QFrame()
+        layoutPomodoro = QVBoxLayout(frame_prefs)
+
+        layoutProgression = QHBoxLayout()
+
+
+
+        progressTime = WidgetCirculo()
+
+        estatatusModo = QLabel()
+        estatatusModo.setText("Trabajando")
+        estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        estatatusModo.setStyleSheet(modo1)
+
+        modoTxt = QLabel()
+        modoTxt.setText("Pomodoro modo")
+        modoTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        modoTxt.setStyleSheet(modo1)
+
+        txt = QLabel()
+        txt.setText("texto relleno")
+        txt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        txt.setStyleSheet(modo1)
+
+
+
+        layoutPomodoro.addSpacing(10)
+        layoutPomodoro.addWidget(progressTime, stretch= 4)
+        layoutPomodoro.addWidget(estatatusModo, stretch= 1)
+        layoutPomodoro.addWidget(modoTxt, stretch= 1)
+
 
         bottom_layout.addWidget(frame_timer, stretch=3)
         bottom_layout.addWidget(frame_prefs, stretch=2)
