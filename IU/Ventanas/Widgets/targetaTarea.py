@@ -1,15 +1,17 @@
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QCheckBox
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QCheckBox, QFrame
 
 
-class tareaTarget(QWidget):
+class tareaTarget(QFrame):
     def __init__(self):
         super().__init__()
 
         self.setStyleSheet('''
         background-color:#5e5e74;
         border-radius:10px;
+       
         ''')
+        self.setMaximumHeight(35)
         self.tareasLayout = QHBoxLayout(self)
 
         self.trabajoLabel = QLabel("Trabajo")
@@ -20,9 +22,13 @@ class tareaTarget(QWidget):
         ''')
         self.checkTrabajo = QCheckBox()
         self.checkTrabajo.setStyleSheet('''
+        
+        QCheckBox {
+                color: white;
+            }
          QCheckBox::indicator {
                 width: 30px;
-                height: 30px;
+                height: 15px;
             }
         ''')
 

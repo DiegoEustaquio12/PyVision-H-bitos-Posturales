@@ -82,19 +82,30 @@ class WidDashboard(QWidget):
         frame_timer = QFrame()
         layoutTimer = QVBoxLayout(frame_timer)
 
-        tareaTxt = QLabel("Tareas")
+        tareaTxt = QLabel("            Tareas")
+        tareaTxt.setStyleSheet('''
+        QLabel{
+        border: transparent;
+        font-size: 20px;
+        font-weight: bold;
+
+        }
+        
+        ''')
         tareaTxt.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         scrollTareas = QScrollArea()
         contenidoScroll = QWidget()
         contenidoLayout = QVBoxLayout(contenidoScroll)
+        contenidoLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
 
         targetas = tareaTarget()
-        for i in range(30):
-            contenidoLayout.addWidget(QLabel(f"tarea {i+1} "))
+        for i in range(8):
+            targetas = tareaTarget()
+            contenidoLayout.addWidget(targetas)
 
-        contenidoLayout.addWidget(targetas)
+
 
         scrollTareas.setWidget(contenidoScroll)
         scrollTareas.setWidgetResizable(True)
@@ -104,7 +115,34 @@ class WidDashboard(QWidget):
         layoutBotones = QHBoxLayout(botonTareaWidget)
 
         buttonAgregar = QPushButton("Agregar")
+        buttonAgregar.setStyleSheet('''
+        QPushButton{
+        background-color: #00897b;
+        font-size: 15px;
+        font-weight: bold;
+        }
+        QPushButton:hover {
+        background-color: #3a998f;
+        }
+        QPushButton:pressed {
+        background-color: #00897b;
+        }
+        ''')
         buttonMarcar = QPushButton("Marcar todo")
+        buttonMarcar.setStyleSheet('''
+        QPushButton{
+        background-color: #9b9696;
+        font-size: 15px;
+        font-weight: bold;
+        }
+        QPushButton:hover {
+        background-color: #c2bbbb;
+        }
+        
+        QPushButton:pressed {
+        background-color: #9b9696;
+        }
+        ''')
         layoutBotones.addWidget(buttonAgregar, stretch= 2)
         layoutBotones.addWidget(buttonMarcar, stretch= 3)
 
