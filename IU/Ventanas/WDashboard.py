@@ -180,7 +180,9 @@ class WidDashboard(QWidget):
 
         layoutPomodoro.addSpacing(10)
         layoutPomodoro.addWidget(progressTime, stretch= 4)
+        layoutPomodoro.addSpacing(15)
         layoutPomodoro.addWidget(estatatusModo, stretch= 1)
+        layoutPomodoro.addSpacing(10)
         layoutPomodoro.addWidget(modoTxt, stretch= 1)
 
 
