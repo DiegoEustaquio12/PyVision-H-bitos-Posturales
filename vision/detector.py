@@ -83,6 +83,25 @@ buffer_hombro_der = deque(maxlen=TAMANO_BUFFER_HOMBROS)
 buffer_cadera_izq = deque(maxlen=TAMANO_BUFFER_TRONCO)
 buffer_cadera_der = deque(maxlen=TAMANO_BUFFER_TRONCO)
 
+
+#Creación de variable global para almacenar los datos del dashboard
+_datos_dashboard = {
+    "estado_postura": "SIN_DETECCION",
+    "tiempo_postura": 0.0,
+    "timestamp": time.time()
+}
+
+# Función para obtener el estado de la postura y el tiempo acumulado
+def obtener_estado_postura():
+    """
+    Función expuesta para que el backend la consuma de manera asíncrona.
+    Retorna el estado y el tiempo acumulado de la postura actual.
+    """
+    global _datos_dashboard
+    _datos_dashboard["timestamp"] = time.time()
+    return _datos_dashboard
+
+
 #funciones de calcular
 def calcular_inclinacion(p1: tuple, p2: tuple) -> float:
     dx = p2[0] - p1[0]
@@ -260,6 +279,7 @@ def dibujar_hud_metricas(
 
 
 def main():
+    global _datos_dashboard
     with open(MODEL_PATH, "rb") as f:
         model_data = f.read()
 
@@ -283,6 +303,9 @@ def main():
     print("Presiona 'q' en la ventana para salir.")
 
     gestor_alerta = GestorAlertaPostura(segundos_umbral=SEGUNDOS_PARA_ACTIVAR_ALERTA)
+    
+    # Variable persistente para controlar el inicio de la buena postura
+    ts_inicio_buena_postura = None
 
     with vision.PoseLandmarker.create_from_options(opciones_vision) as landmarker:
         while True:
@@ -382,6 +405,39 @@ def main():
                     cadera_izq, cadera_der, centro_caderas,
                     color_estado,
                 )
+
+            # Diccionarioz
+            if not resultados.pose_landmarks:
+                estado_postura_dashboard = "SIN_DETECCION"
+                tiempo_postura_dashboard = 0.0
+                ts_inicio_buena_postura = None
+            else:
+                if alerta_activa:
+                    estado_postura_dashboard = "ALERTA"
+                    tiempo_postura_dashboard = round(gestor_alerta.duracion_mala_postura_actual, 2)
+                    ts_inicio_buena_postura = None
+                elif es_mala_postura_frame:
+                    estado_postura_dashboard = "INCORRECTA"
+                    tiempo_postura_dashboard = round(gestor_alerta.duracion_mala_postura_actual, 2)
+                    ts_inicio_buena_postura = None
+                else:
+                    estado_postura_dashboard = "CORRECTA"
+                    if ts_inicio_buena_postura is None:
+                        ts_inicio_buena_postura = time.monotonic()
+                    tiempo_postura_dashboard = round(time.monotonic() - ts_inicio_buena_postura, 2)
+
+            # >> NOTA INTERNA DE BACKEND <<
+            # En esta sección del flujo ya tienes disponibles:
+            # - `estado_postura_dashboard` (String)
+            # - `tiempo_postura_dashboard` (Float en segundos)
+            # Puedes enviarlas por WebSockets, un cliente MQTT, o una cola de tareas.
+            # ========================================================
+
+            # =====================================================================
+            # >>> AQUÍ SE ESCRIBEN LOS DATOS EN TIEMPO REAL EN LA VARIABLE GLOBAL <<<
+            # =====================================================================
+            _datos_dashboard["estado_postura"] = estado_postura_dashboard
+            _datos_dashboard["tiempo_postura"] = tiempo_postura_dashboard
 
             # Textos
             fuente = cv2.FONT_HERSHEY_SIMPLEX
