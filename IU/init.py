@@ -130,7 +130,6 @@ class PyVisionWindow(QMainWindow):
 
         ancho_inicio = 210 if expandido else 60
         ancho_fin = 60 if expandido else 210
-
         if ancho_inicio > 60 :
             self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(100, 100,
                                                                     Qt.AspectRatioMode.KeepAspectRatio,

@@ -1,5 +1,7 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QCheckBox
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
+    QSizePolicy, QComboBox
 from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
@@ -82,7 +84,7 @@ class WidDashboard(QWidget):
         frame_timer = QFrame()
         layoutTimer = QVBoxLayout(frame_timer)
 
-        tareaTxt = QLabel("            Tareas")
+        tareaTxt = QLabel("         Tareas")
         tareaTxt.setStyleSheet('''
         QLabel{
         border: transparent;
@@ -155,35 +157,79 @@ class WidDashboard(QWidget):
         frame_prefs = QFrame()
         layoutPomodoro = QVBoxLayout(frame_prefs)
 
-        layoutProgression = QHBoxLayout()
-
-
-
         progressTime = WidgetCirculo()
+
+        widgetStart = QWidget()
+        layoutStart = QHBoxLayout(widgetStart)
 
         estatatusModo = QLabel()
         estatatusModo.setText("Trabajando")
         estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         estatatusModo.setStyleSheet(modo1)
 
+        buttonStart = QPushButton("Empezar")
+        buttonStart.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+
+        layoutStart.addWidget(estatatusModo)
+        layoutStart.addWidget(buttonStart)
+
+        SelectModeBar = QWidget()
+        layoutSelect = QHBoxLayout(SelectModeBar)
+
+
+        buttonMode = QPushButton("|||")
+        buttonMode.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        buttonMode.setStyleSheet('''
+                QPushButton{
+                background-color: #9b9696;
+                font-size: 15px;
+                font-weight: bold;
+                border-radius: 10px;
+                }
+                QPushButton:hover {
+                background-color: #c2bbbb;
+                }
+
+                QPushButton:pressed {
+                background-color: #9b9696;
+                }
+                ''')
+        selecMenu = QMenu(self)
+        selecMenu.addAction(QAction("Pomodoro", buttonMode))
+        selecMenu.addAction(QAction("Enfoque", buttonMode))
+        selecMenu.addAction(QAction("Predeterminado", buttonMode))
+        selecMenu.setStyleSheet("""
+        QMenu {
+            background-color: #2b2d31;
+            color: white;
+            border: 1px solid #444;
+        }
+
+        QMenu::item {
+            padding: 8px 30px;
+        }
+
+        QMenu::item:selected {
+            background-color: #5865F2;
+        }
+        """)
+        buttonMode.setMenu(selecMenu)
+        buttonMode.show()
+
         modoTxt = QLabel()
         modoTxt.setText("Pomodoro modo")
         modoTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         modoTxt.setStyleSheet(modo1)
 
-        txt = QLabel()
-        txt.setText("texto relleno")
-        txt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        txt.setStyleSheet(modo1)
+        layoutSelect.addWidget(modoTxt, stretch= 4)
+        layoutSelect.addWidget(buttonMode, stretch= 1)
 
-
-
-        layoutPomodoro.addSpacing(10)
+        layoutPomodoro.addStretch()
         layoutPomodoro.addWidget(progressTime, stretch= 4)
         layoutPomodoro.addSpacing(15)
-        layoutPomodoro.addWidget(estatatusModo, stretch= 1)
+        layoutPomodoro.addWidget(widgetStart, stretch= 1)
         layoutPomodoro.addSpacing(10)
-        layoutPomodoro.addWidget(modoTxt, stretch= 1)
+        layoutPomodoro.addWidget(SelectModeBar, stretch= 1)
 
 
         bottom_layout.addWidget(frame_timer, stretch=3)
