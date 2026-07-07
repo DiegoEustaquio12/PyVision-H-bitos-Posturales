@@ -7,18 +7,24 @@ class tareaTarget(QFrame):
         super().__init__()
 
         self.setStyleSheet('''
-        background-color:#5e5e74;
+        QFrame{
+        background-color: rgba(255,255,255,40);
+        border: 1px solid rgba(255,255,255,80);
         border-radius:10px;
-       
+         }
         ''')
+
+
         self.setMaximumHeight(35)
         self.tareasLayout = QHBoxLayout(self)
 
         self.trabajoLabel = QLabel("Trabajo")
         self.trabajoLabel.setStyleSheet('''
         font-size:12px;
-        border:1px solid #5e5e74;
+        border-color: transparent;
         font-weight:bold;
+        background-color: transparent;
+        
         ''')
         self.checkTrabajo = QCheckBox()
         self.checkTrabajo.setStyleSheet('''

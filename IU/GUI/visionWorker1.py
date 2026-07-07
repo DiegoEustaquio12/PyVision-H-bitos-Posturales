@@ -14,6 +14,7 @@ class VisionWorker(QThread):
     def run(self):
         while self._running:
             datos = visonAdapter.obtener_estado_postura()
+            print(f"datos: {datos}")
             if datos is None:
                 continue
 

@@ -1,26 +1,19 @@
-import cv2
-import numpy as np
-import time
 
+import vision.visionCopy as visionModule
 
-
-
-
-
-
-_cap = cv2.VideoCapture(0)
+def iniciar_vision():
+    visionModule.iniciar_vision()
 
 def obtener_estado_postura():
-    ret, frame = _cap.read()
-    if not ret:
+    datos = visionModule.obtener_datos_dashboard()
+    if datos["frame"] is None:
         return None
-
-    estado = "CORRECTA"
     return {
-        "frame": frame,
-        "estado_postura": estado,
-        "timestamp": time.time(),
+
+        "frame": datos["frame"],
+        "estado_postura": datos["estado_postura"],
+        "timestamp": datos["tiempo_postura"]
     }
 
 def liberar_camara():
-    _cap.release()
+    visionModule.detener_vision()

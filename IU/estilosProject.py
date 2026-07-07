@@ -94,24 +94,25 @@ contadores = '''
            
            QLabel {
 
-            font-size: 20px;     
+            font-size: 18px;     
          
             border: transparent;
             font-family: Inter;                            
             background-color: Transparent;
+            font-weight: bold;
          
             
                 }
  '''
 contador1 = contadores + '''
 QLabel {
-color: #00897b;            
+color: white;            
                 }
 '''
 
 contador2 = contadores + '''
 QLabel {
-color: #ff8484;            
+color: white;            
                 }
 '''
 

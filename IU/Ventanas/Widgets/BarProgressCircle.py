@@ -8,8 +8,6 @@ class WidgetCirculo(QWidget):
     def __init__(self):
         super().__init__()
         self.bar_width = 14
-        self.bg_color = QColor("#203d2f")
-        self.progressColor = QColor("#056d38")
         self.textColor = QColor("#FFFFFF")
         self.setMinimumSize(200, 200)
 
@@ -53,18 +51,23 @@ class WidgetCirculo(QWidget):
 
         rect = QRectF(x, y, lado, lado)
 
+        # Progreso
+        fraction = self.get_fraction()
+        angulo = int(fraction * 360 * 16)
+
+        colorBackground = self.get_background_color(fraction)
         # Fondo
-        pen_bg = QPen(self.bg_color)
+        pen_bg = QPen(colorBackground)
         pen_bg.setWidth(self.bar_width)
         pen_bg.setCapStyle(Qt.RoundCap)
         painter.setPen(pen_bg)
         painter.drawArc(rect, 0, 360 * 16)
 
-        # Progreso
-        fraction = self.get_fraction()
-        angulo = int(fraction * 360 * 16)
 
-        pen_progress = QPen(self.progressColor)
+
+        colorActual = self.get_progress_color(fraction)
+
+        pen_progress = QPen(colorActual)
         pen_progress.setWidth(self.bar_width)
         pen_progress.setCapStyle(Qt.RoundCap)
         painter.setPen(pen_progress)
@@ -74,4 +77,17 @@ class WidgetCirculo(QWidget):
         painter.setPen(self.textColor)
         painter.setFont(QFont("Segoe UI", int(lado * 0.18), QFont.Bold))
         painter.drawText(self.rect(), Qt.AlignCenter, self.get_time_text())
+
+    def get_progress_color(self, fraction):
+        # fraction: 1.0 (inicio, verde) -> 0.0 (final, rojo)
+        hue = int(fraction * 120)  # 120=verde, 60=amarillo, 0=rojo
+        color = QColor()
+        color.setHsv(hue, 255, 150)  # value=200 para que no sea demasiado brillante
+        return color
+    def get_background_color(self, fraction):
+        # fraction: 1.0 (inicio, verde) -> 0.0 (final, rojo)
+        hue1 = int(fraction * 120)  # 120=verde, 60=amarillo, 0=rojo
+        color2 = QColor()
+        color2.setHsv(hue1, 255, 50)  # value=200 para que no sea demasiado brillante
+        return color2
 

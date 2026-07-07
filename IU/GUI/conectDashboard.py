@@ -7,11 +7,16 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPixmap
 
 from visionWorker1 import VisionWorker
+import visonAdapter
+import time
 
 
 class Ventana(QWidget):
     def __init__(self):
         super().__init__()
+
+        visonAdapter.iniciar_vision()
+
 
         self.setWindowTitle("Prueba VisionWorker")
         self.resize(900, 700)
@@ -59,6 +64,7 @@ class Ventana(QWidget):
         # ==========================
         # Vision Worker
         # ==========================
+
         self.vision_worker = VisionWorker()
         self.vision_worker.frame_ready.connect(self._actualizar_camara)
         self.vision_worker.estado_actualizado.connect(self._actualizar_pill)
@@ -77,8 +83,13 @@ class Ventana(QWidget):
         )
 
     def _actualizar_pill(self, estado):
-        color = "#4CAF50" if estado == "CORRECTA" else "#E53935"
-
+        colores = {
+            "CORRECTA": "#4CAF50",
+            "INCORRECTA": "#E53935",
+            "ALERTA": "#FF6F00",
+            "SIN_DETECCION": "#9E9E9E",
+        }
+        color = colores.get(estado, "#9E9E9E")
         self.pill_estado.setText(estado)
         self.pill_estado.setStyleSheet(f"""
             background:{color};
@@ -90,6 +101,7 @@ class Ventana(QWidget):
 
     def closeEvent(self, event):
         self.vision_worker.stop()
+        time.sleep(0.3)
         event.accept()
 
 

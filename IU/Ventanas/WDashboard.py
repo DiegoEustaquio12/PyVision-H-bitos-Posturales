@@ -1,10 +1,11 @@
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
     QSizePolicy, QComboBox
 from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
+
 
 class WidDashboard(QWidget):
     def __init__(self):
@@ -23,7 +24,7 @@ class WidDashboard(QWidget):
 
         frameDetect = QFrame(objectName = "frameInterno")
         layoutDetect = QVBoxLayout(frameDetect)
-        layoutDetect.setContentsMargins(30, 20, 25, 12)
+        layoutDetect.setContentsMargins(12, 15, 25, 10)
 
         estatusTxt = QLabel()
         estatusTxt.setText("Postura Correcta")
@@ -31,17 +32,81 @@ class WidDashboard(QWidget):
         estatusTxt.setStyleSheet(estado1)
 
 
-        postureGoodTxt = QLabel()
-        postureGoodTxt.setText("Tiempo con buena postura:       5:20")
-        postureGoodTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureGoodTxt.setStyleSheet(contador1)
-        postureGoodTxt.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        widgetTiempos = QWidget()
+        layoutTiempos = QHBoxLayout(widgetTiempos)
 
-        postureBadTxt = QLabel()
-        postureBadTxt.setText("Tiempo con mala postura:         1:30")
-        postureBadTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureBadTxt.setStyleSheet(contador2)
-        postureBadTxt.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        frameTiempo1=QFrame()
+        frameTiempo1.setStyleSheet('''
+        QFrame{
+        background-color: rgba(255,255,255,40);
+        border: 1px solid rgba(255,255,255,80);
+        border-radius:20px;
+         }
+        ''')
+        layoutFrame1 = QVBoxLayout(frameTiempo1)
+
+        frameTiempo2 =QFrame()
+        frameTiempo2.setStyleSheet('''
+        QFrame{
+        background-color: #8d0809;
+        }
+        ''')
+        layoutFrame2 = QVBoxLayout(frameTiempo2)
+
+        linea = QFrame()
+        linea.setFrameShape(QFrame.Shape.HLine)
+        linea.setFrameShadow(QFrame.Shadow.Sunken)
+        linea.setFixedHeight(1)
+        linea.setStyleSheet("""
+        QFrame{
+            background-color: #b4b4b4;
+            border-color: transparent;
+        }
+        """)
+
+        linea2 = QFrame()
+        linea2.setFrameShape(QFrame.Shape.HLine)
+        linea2.setFrameShadow(QFrame.Shadow.Sunken)
+        linea2.setFixedHeight(1)
+        linea2.setStyleSheet("""
+         QFrame{
+             background-color: #b4b4b4;
+             border-color: transparent;
+         }
+         """)
+
+        postureGoodTxt1 = QLabel()
+        postureGoodTxt1.setText("Buena Postura")
+        postureGoodTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        postureGoodTxt1.setStyleSheet(contador1)
+
+
+        postureGoodTxt2 = QLabel()
+        postureGoodTxt2.setText("5:20")
+        postureGoodTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        postureGoodTxt2.setStyleSheet(contador1)
+
+        layoutFrame1.addWidget(postureGoodTxt1)
+        layoutFrame1.addWidget(linea)
+        layoutFrame1.addWidget(postureGoodTxt2)
+
+
+        postureBadTxt1 = QLabel()
+        postureBadTxt1.setText("Mala Postura")
+        postureBadTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        postureBadTxt1.setStyleSheet(contador2)
+
+        postureBadTxt2 = QLabel()
+        postureBadTxt2.setText("1:30")
+        postureBadTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        postureBadTxt2.setStyleSheet(contador2)
+
+        layoutFrame2.addWidget(postureBadTxt1)
+        layoutFrame2.addWidget(linea2)
+        layoutFrame2.addWidget(postureBadTxt2)
+
+        layoutTiempos.addWidget(frameTiempo1)
+        layoutTiempos.addWidget(frameTiempo2)
 
         rachaTxt = QLabel()
         rachaTxt.setText("Racha:          2:05 min")
@@ -58,11 +123,9 @@ class WidDashboard(QWidget):
 
 
         layoutDetect.addWidget(estatusTxt, alignment= Qt.AlignmentFlag.AlignTop)
-        layoutDetect.addSpacing(30)
-        layoutDetect.addWidget(postureGoodTxt)
         layoutDetect.addSpacing(4)
-        layoutDetect.addWidget(postureBadTxt)
-        layoutDetect.addSpacing(10)
+        layoutDetect.addWidget(widgetTiempos)
+        layoutDetect.addSpacing(4)
         layoutDetect.addWidget(rachaTxt)
         layoutDetect.addStretch()
         layoutDetect.addWidget(timeSeccionTxt)
@@ -103,7 +166,7 @@ class WidDashboard(QWidget):
 
 
         targetas = tareaTarget()
-        for i in range(8):
+        for i in range(4):
             targetas = tareaTarget()
             contenidoLayout.addWidget(targetas)
 
@@ -167,17 +230,21 @@ class WidDashboard(QWidget):
         estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         estatatusModo.setStyleSheet(modo1)
 
-        buttonStart = QPushButton("Empezar")
+        buttonStart = QPushButton()
+        buttonStart.setIcon(QIcon("pictures/play.svg"))
+        buttonStart.setIconSize(QSize(21, 21))
         buttonStart.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
 
-        layoutStart.addWidget(estatatusModo)
-        layoutStart.addWidget(buttonStart)
+        layoutStart.addWidget(estatatusModo, stretch= 3)
+        layoutStart.addWidget(buttonStart, stretch= 1)
 
         SelectModeBar = QWidget()
         layoutSelect = QHBoxLayout(SelectModeBar)
 
 
-        buttonMode = QPushButton("|||")
+        buttonMode = QPushButton(self)
+        buttonMode.setIcon(QIcon("pictures/menu.svg"))
+        buttonMode.setIconSize(QSize(19, 19))
         buttonMode.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         buttonMode.setStyleSheet('''
                 QPushButton{
@@ -194,10 +261,24 @@ class WidDashboard(QWidget):
                 background-color: #9b9696;
                 }
                 ''')
+
+        self.modoTxt = QLabel(self)
+        self.modoTxt.setText("Modo")
+        self.modoTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.modoTxt.setStyleSheet(modo1)
+
+
         selecMenu = QMenu(self)
-        selecMenu.addAction(QAction("Pomodoro", buttonMode))
-        selecMenu.addAction(QAction("Enfoque", buttonMode))
-        selecMenu.addAction(QAction("Predeterminado", buttonMode))
+        accionPomodoro = selecMenu.addAction("Pomodoro")
+        accionEnfoque = selecMenu.addAction("Enfoque")
+        accionPredeterminado = selecMenu.addAction("Predeterminado")
+
+        accionPomodoro.triggered.connect(self.txtPomodoro)
+        accionEnfoque.triggered.connect(self.txtEnfoque)
+        accionPredeterminado.triggered.connect(self.txtPredeterminado)
+
+
+
         selecMenu.setStyleSheet("""
         QMenu {
             background-color: #2b2d31;
@@ -216,12 +297,9 @@ class WidDashboard(QWidget):
         buttonMode.setMenu(selecMenu)
         buttonMode.show()
 
-        modoTxt = QLabel()
-        modoTxt.setText("Pomodoro modo")
-        modoTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        modoTxt.setStyleSheet(modo1)
 
-        layoutSelect.addWidget(modoTxt, stretch= 4)
+
+        layoutSelect.addWidget(self.modoTxt, stretch= 4)
         layoutSelect.addWidget(buttonMode, stretch= 1)
 
         layoutPomodoro.addStretch()
@@ -237,4 +315,12 @@ class WidDashboard(QWidget):
 
         right_layout.addWidget(frame_status, stretch=50)
         right_layout.addWidget(bottom_widget, stretch=50)
+
+    def txtPomodoro(self):
+        self.modoTxt.setText("Pomodoro Mode")
+    def txtEnfoque(self):
+        self.modoTxt.setText("Enfoque Mode")
+    def txtPredeterminado(self):
+        self.modoTxt.setText("Predeterminado Mode")
+
 
