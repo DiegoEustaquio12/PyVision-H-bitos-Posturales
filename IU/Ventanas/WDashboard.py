@@ -11,6 +11,8 @@ class WidDashboard(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.ciclosTerminados = 0
+
         right_layout = QVBoxLayout(self)
         right_layout.setContentsMargins(0, 0, 15, 0)
         right_layout.setSpacing(15)
@@ -108,11 +110,14 @@ class WidDashboard(QWidget):
         layoutTiempos.addWidget(frameTiempo1)
         layoutTiempos.addWidget(frameTiempo2)
 
+        frameRacha = QFrame()
+        layoutRachaa = QHBoxLayout(frameRacha)
+
         rachaTxt = QLabel()
         rachaTxt.setText("Racha:          2:05 min")
-        rachaTxt.setAlignment(Qt.AlignmentFlag.AlignLeft)
         rachaTxt.setStyleSheet(racha)
         rachaTxt.setFixedWidth(300)
+
 
         timeSeccionTxt = QLabel()
         timeSeccionTxt.setText("Tiempo de sesión:    6:50")
@@ -220,23 +225,42 @@ class WidDashboard(QWidget):
         frame_prefs = QFrame()
         layoutPomodoro = QVBoxLayout(frame_prefs)
 
-        progressTime = WidgetCirculo()
+        self.progressTime = WidgetCirculo()
+        self.progressTime.finished.connect(self.pomodoroTerminado)
+        self.progressTime.cambioFase.connect(self.al_cambiar_fase)
 
         widgetStart = QWidget()
         layoutStart = QHBoxLayout(widgetStart)
 
-        estatatusModo = QLabel()
-        estatatusModo.setText("Trabajando")
-        estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        estatatusModo.setStyleSheet(modo1)
+        self.estatatusModo = QLabel()
+        self.estatatusModo.setText("Trabajando")
+        self.estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.estatatusModo.setStyleSheet(modo1)
 
-        buttonStart = QPushButton()
-        buttonStart.setIcon(QIcon("pictures/play.svg"))
-        buttonStart.setIconSize(QSize(21, 21))
-        buttonStart.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.buttonStart = QPushButton()
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        #self.buttonStart.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.buttonStart.clicked.connect(self.accionBotonPomodoro)
 
-        layoutStart.addWidget(estatatusModo, stretch= 3)
-        layoutStart.addWidget(buttonStart, stretch= 1)
+        self.buttonRefresh = QPushButton()
+        self.buttonRefresh.setIcon(QIcon("pictures/refresh.svg"))
+        self.buttonRefresh.setIconSize(QSize(21, 21))
+        self.buttonRefresh.setStyleSheet('''
+        QPushButton::disabled {
+        background-color: black;
+        }
+        
+        ''')
+        #self.buttonRefresh.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.buttonRefresh.clicked.connect(self.accionBotonRefresh)
+        self.buttonRefresh.setEnabled(False)
+
+
+
+        layoutStart.addWidget(self.estatatusModo, stretch= 3)
+        layoutStart.addWidget(self.buttonStart, stretch= 1)
+        layoutStart.addWidget(self.buttonRefresh, stretch= 1)
 
         SelectModeBar = QWidget()
         layoutSelect = QHBoxLayout(SelectModeBar)
@@ -303,10 +327,10 @@ class WidDashboard(QWidget):
         layoutSelect.addWidget(buttonMode, stretch= 1)
 
         layoutPomodoro.addStretch()
-        layoutPomodoro.addWidget(progressTime, stretch= 4)
-        layoutPomodoro.addSpacing(15)
+        layoutPomodoro.addWidget(self.progressTime, stretch= 4)
+        layoutPomodoro.addStretch()
         layoutPomodoro.addWidget(widgetStart, stretch= 1)
-        layoutPomodoro.addSpacing(10)
+
         layoutPomodoro.addWidget(SelectModeBar, stretch= 1)
 
 
@@ -317,10 +341,52 @@ class WidDashboard(QWidget):
         right_layout.addWidget(bottom_widget, stretch=50)
 
     def txtPomodoro(self):
+        self.progressTime.set_tiempos(30,15)
         self.modoTxt.setText("Pomodoro Mode")
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.buttonRefresh.setEnabled(True)
+
     def txtEnfoque(self):
+        self.progressTime.set_tiempos(20, 15)
         self.modoTxt.setText("Enfoque Mode")
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.buttonRefresh.setEnabled(True)
+
     def txtPredeterminado(self):
+        self.progressTime.set_tiempos(15, 10)
         self.modoTxt.setText("Predeterminado Mode")
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.buttonRefresh.setEnabled(True)
+
+    def accionBotonPomodoro(self):
+        if self.progressTime.runningTime():
+            self.progressTime.pausar()
+            self.buttonRefresh.setEnabled(True)
+            self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+            self.buttonStart.setIconSize(QSize(21, 21))
+        else:
+            self.progressTime.iniciar()
+            self.buttonRefresh.setEnabled(False)
+            self.buttonStart.setIcon(QIcon("pictures/stop.svg"))
+            self.buttonStart.setIconSize(QSize(21, 21))
+
+    def accionBotonRefresh(self):
+        self.progressTime.reiniciar()
+
+    def pomodoroTerminado(self):
+
+        self.ciclosTerminados += 1
+
+    def al_cambiar_fase(self, working):
+        if working:
+            self.estatatusModo.setText("Trabajando")
+        else:
+            self.estatatusModo.setText("Descansando")
+
+
+
 
 

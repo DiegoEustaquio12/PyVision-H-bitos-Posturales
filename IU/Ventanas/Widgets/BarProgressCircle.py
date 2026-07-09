@@ -1,34 +1,69 @@
-from PySide6.QtCore import Qt, QRectF, QTimer
+from PySide6.QtCore import Qt, QRectF, QTimer, Signal, QUrl
 from PySide6.QtGui import QPainter, QPen, QColor, QFont
 from PySide6.QtWidgets import QWidget, QApplication, QVBoxLayout
 import sys
+from PySide6.QtMultimedia import QSoundEffect
 
 
 class WidgetCirculo(QWidget):
+    finished = Signal()
+    cambioFase = Signal(bool)
     def __init__(self):
         super().__init__()
         self.bar_width = 14
         self.textColor = QColor("#FFFFFF")
         self.setMinimumSize(200, 200)
 
+        self.workSeconds = 20
+        self.restSeconds = 10
+        self.working = True
 
-
-        self.total_seconds = 60
-        self.remaining_seconds = 60 * 1000
+        self.total_seconds = self.workSeconds
+        self.remaining_seconds = self.total_seconds * 1000
 
         self.timer = QTimer(self)
         self.timer.setInterval(100)
         self.timer.timeout.connect(self.updateCirculo)
-        self.timer.start()
+        #self.timer.start()
+
+
+        self.sonidos_alerta =QSoundEffect()
+        self.sonidos_alerta.setVolume(0.5)
+
+        self.yaSonoAlerta = False
 
     def updateCirculo(self):
         self.remaining_seconds -= self.timer.interval()
 
+        if self.remaining_seconds <= 5000 and not self.yaSonoAlerta:
+            pass
+
         if self.remaining_seconds <= 0:
-            self.remaining_seconds = 0
-            self.timer.stop()
+            #self.remaining_seconds = 0
+            self.finished.emit()
+            self.alternarFase()
+            #self.reiniciar()
+            self.timer.start()
 
         self.update()
+
+    def set_tiempos(self, work_seconds, rest_seconds):
+        """Se llama desde el QMenu al elegir una opción (Pomodoro/Enfoque/Predeterminado)."""
+        self.workSeconds = work_seconds
+        self.restSeconds = rest_seconds
+        self.working = True
+        self.total_seconds = self.workSeconds
+        self.remaining_seconds = self.total_seconds * 1000
+        self.timer.stop()
+        self.cambioFase.emit(self.working)
+        self.update()
+
+    def alternarFase(self):
+        self.working = not self.working
+        self.total_seconds = self.workSeconds if self.working else self.restSeconds
+        self.remaining_seconds = self.total_seconds * 1000
+        self.cambioFase.emit(self.working)
+
 
     def get_fraction(self):
         total_ms = self.total_seconds * 1000
@@ -85,9 +120,25 @@ class WidgetCirculo(QWidget):
         color.setHsv(hue, 255, 150)  # value=200 para que no sea demasiado brillante
         return color
     def get_background_color(self, fraction):
-        # fraction: 1.0 (inicio, verde) -> 0.0 (final, rojo)
-        hue1 = int(fraction * 120)  # 120=verde, 60=amarillo, 0=rojo
+
+        hue1 = int(fraction * 120)
         color2 = QColor()
-        color2.setHsv(hue1, 255, 50)  # value=200 para que no sea demasiado brillante
+        color2.setHsv(hue1, 255, 50)
         return color2
+
+    def iniciar(self):
+        if self.remaining_seconds <= 0:
+            self.reiniciar()
+        self.timer.start()
+
+    def pausar(self):
+        self.timer.stop()
+
+    def reiniciar(self):
+        self.timer.stop()
+        self.remaining_seconds = self.total_seconds * 1000
+        self.update()
+
+    def runningTime(self):
+        return self.timer.isActive()
 

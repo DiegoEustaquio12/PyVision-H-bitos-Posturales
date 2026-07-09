@@ -16,7 +16,8 @@ from IU.Ventanas.WConfig import WidConfiguracion
 class PyVisionWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PyVision")
+        self.setWindowTitle(" ")
+        self.setWindowIcon(QIcon("pictures/logoLab.svg"))
         self.setMinimumSize(1100, 680)
         self.setStyleSheet(estilo1)
 

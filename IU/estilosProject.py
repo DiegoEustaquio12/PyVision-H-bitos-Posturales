@@ -83,7 +83,8 @@ modo1 ="""
     padding: 5px;                    
 """
 racha ="""
-    background-color: #2b2d31;      
+    background-color: transparent;
+    border: transparent;;      
     color: white; 
     font-size: 25px;     
     font-weight: bold;
