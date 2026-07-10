@@ -1,10 +1,11 @@
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
-    QSizePolicy, QComboBox
+    QSizePolicy, QComboBox, QDialog
 from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
+from IU.Ventanas.Widgets.dialogoTarea import dialogoNuevaTarea
 
 
 class WidDashboard(QWidget):
@@ -164,28 +165,61 @@ class WidDashboard(QWidget):
         ''')
         tareaTxt.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
-        scrollTareas = QScrollArea()
-        contenidoScroll = QWidget()
-        contenidoLayout = QVBoxLayout(contenidoScroll)
-        contenidoLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scrollTareas = QScrollArea()
+        self.contenidoScroll = QWidget()
+        self.contenidoLayout = QVBoxLayout(self.contenidoScroll)
+        self.contenidoLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.scrollTareas.setStyleSheet('''
+        QScrollArea {
+    border: none;
+    background: transparent;
+}
+
+QScrollArea > QWidget > QWidget {
+    background: #1f1f1f;
+    border-radius: 15px;
+}
+        ''')
+
+        self.listaTareas = []
 
 
-        targetas = tareaTarget()
-        for i in range(4):
-            targetas = tareaTarget()
-            contenidoLayout.addWidget(targetas)
+
+        self.targetas1 = tareaTarget(texto="tarea 1")
+        self.targetas2 = tareaTarget(texto="tarea 2")
+        self.targetas3 = tareaTarget(texto="tarea 3")
+
+        self.listaTareas.append(self.targetas1)
+        self.listaTareas.append(self.targetas2)
+        self.listaTareas.append(self.targetas3)
 
 
 
-        scrollTareas.setWidget(contenidoScroll)
-        scrollTareas.setWidgetResizable(True)
+        self.contenidoLayout.addWidget(self.targetas1)
+        self.contenidoLayout.addWidget(self.targetas2)
+        self.contenidoLayout.addWidget(self.targetas3)
+
+        self.targetas1.estadoCambiado.connect(self.cambioCheckout)
+        self.targetas1.solicitudEliminar.connect(self.eleminarFrameTarea)
+        self.targetas2.estadoCambiado.connect(self.cambioCheckout)
+        self.targetas2.solicitudEliminar.connect(self.eleminarFrameTarea)
+        self.targetas3.estadoCambiado.connect(self.cambioCheckout)
+        self.targetas3.solicitudEliminar.connect(self.eleminarFrameTarea)
+
+
+
+
+
+        self.scrollTareas.setWidget(self.contenidoScroll)
+        self.scrollTareas.setWidgetResizable(True)
+
 
 
         botonTareaWidget = QWidget()
         layoutBotones = QHBoxLayout(botonTareaWidget)
 
-        buttonAgregar = QPushButton("Agregar")
-        buttonAgregar.setStyleSheet('''
+        self.buttonAgregar = QPushButton("Agregar")
+        self.buttonAgregar.setStyleSheet('''
         QPushButton{
         background-color: #00897b;
         font-size: 15px;
@@ -198,8 +232,8 @@ class WidDashboard(QWidget):
         background-color: #00897b;
         }
         ''')
-        buttonMarcar = QPushButton("Marcar todo")
-        buttonMarcar.setStyleSheet('''
+        self.buttonMarcar = QPushButton("Eliminar Completadas")
+        self.buttonMarcar.setStyleSheet('''
         QPushButton{
         background-color: #9b9696;
         font-size: 15px;
@@ -213,11 +247,13 @@ class WidDashboard(QWidget):
         background-color: #9b9696;
         }
         ''')
-        layoutBotones.addWidget(buttonAgregar, stretch= 2)
-        layoutBotones.addWidget(buttonMarcar, stretch= 3)
+        layoutBotones.addWidget(self.buttonAgregar, stretch= 2)
+        layoutBotones.addWidget(self.buttonMarcar, stretch= 3)
+
+        self.buttonAgregar.clicked.connect(self.accionAgregarTarea)
 
         layoutTimer.addWidget(tareaTxt)
-        layoutTimer.addWidget(scrollTareas)
+        layoutTimer.addWidget(self.scrollTareas)
         layoutTimer.addWidget(botonTareaWidget)
 
 
@@ -386,7 +422,22 @@ class WidDashboard(QWidget):
         else:
             self.estatatusModo.setText("Descansando")
 
+    def cambioCheckout(self, targeta, completado):
+        print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
 
+    def accionAgregarTarea(self):
+        dialogNewTarea = dialogoNuevaTarea(self)
+        if dialogNewTarea.exec():
+            targetas = tareaTarget(texto= dialogNewTarea.texto_resultado)
+            self.contenidoLayout.addWidget(targetas)
+            targetas.estadoCambiado.connect(self.cambioCheckout)
+            self.listaTareas.append(targetas)
+            targetas.solicitudEliminar.connect(self.eleminarFrameTarea)
 
+    def eleminarFrameTarea(self, targeta):
+        self.contenidoLayout.addWidget(targeta)
+        self.listaTareas.remove(targeta)
+        targeta.deleteLater()
+        print(targeta.trabajoLabel.text(), " ah sido elimidado")
 
 

@@ -14,8 +14,8 @@ class WidgetCirculo(QWidget):
         self.textColor = QColor("#FFFFFF")
         self.setMinimumSize(200, 200)
 
-        self.workSeconds = 20
-        self.restSeconds = 10
+        self.workSeconds = 10 * 60
+        self.restSeconds = 5* 60
         self.working = True
 
         self.total_seconds = self.workSeconds
@@ -28,6 +28,7 @@ class WidgetCirculo(QWidget):
 
 
         self.sonidos_alerta =QSoundEffect()
+        self.sonidos_alerta.setSource(QUrl.fromLocalFile("sounds/alarmaPomodoro.wav"))
         self.sonidos_alerta.setVolume(0.5)
 
         self.yaSonoAlerta = False
@@ -35,8 +36,8 @@ class WidgetCirculo(QWidget):
     def updateCirculo(self):
         self.remaining_seconds -= self.timer.interval()
 
-        if self.remaining_seconds <= 5000 and not self.yaSonoAlerta:
-            pass
+        if self.remaining_seconds == 3600:
+            self.sonidos_alerta.play()
 
         if self.remaining_seconds <= 0:
             #self.remaining_seconds = 0
