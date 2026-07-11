@@ -29,9 +29,9 @@ class ContadorPostura:
 
         elif estado_postura == "ALERTA":
             self.tiempo_incorrecta += delta
-            racha_actual = 0.0
+            self.racha_actual = 0.0
 
-        elif estado_postura == "SIN DETECCION":
+        elif estado_postura == "SIN_DETECCION":
             self.racha_actual = 0.0
 
     def obtener_resumen(self):

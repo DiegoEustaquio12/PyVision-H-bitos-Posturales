@@ -32,8 +32,8 @@ class PyVisionWindow(QMainWindow):
 
         # --- Frame 1: Sidebar ---
         self.sidebar = QFrame(objectName = "Sidebar")
-        self.sidebar.setMaximumWidth(210)
-        self.sidebar.setMinimumWidth(210)
+        self.sidebar.setMaximumWidth(60)
+        self.sidebar.setMinimumWidth(60)
 
 
         self.sidebarLayout = QVBoxLayout()
@@ -42,7 +42,7 @@ class PyVisionWindow(QMainWindow):
 
         self.logo = QLabel()
         self.logo.setStyleSheet(imagenes)
-        self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(150, 150,
+        self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(100, 100,
                                                                 Qt.AspectRatioMode.KeepAspectRatio,
                                                                 Qt.TransformationMode.SmoothTransformation))
         self.logo.setFixedHeight(60)

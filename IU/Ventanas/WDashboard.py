@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QAction, QIcon, QPixmap
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
     QSizePolicy, QComboBox, QDialog
@@ -12,10 +12,32 @@ from IU.GUI.visionWorker1 import VisionWorker
 from IU.GUI import visonAdapter
 import time
 
+import os
+from PySide6.QtMultimedia import QSoundEffect
+
+
 
 class WidDashboard(QWidget):
     def __init__(self):
         super().__init__()
+
+        self._sonido_alerta = QSoundEffect()
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        ruta_wav = os.path.normpath(os.path.join(base_path, "..", "sounds", "errorSound.wav"))
+        self._sonido_alerta.setSource(QUrl.fromLocalFile(ruta_wav))
+        self._sonido_alerta.setLoopCount(-2)
+        self._sonido_alerta.setVolume(1)
+
+        self._estado_anterior = None
+
+        self._sonido_ausencia = QSoundEffect()
+        base_path_deteccion = os.path.dirname(os.path.abspath(__file__))
+        ruta_wav_2 = os.path.normpath(os.path.join(base_path_deteccion, "..", "sounds", "sinDeteccion.wav"))
+        self._sonido_ausencia.setSource(QUrl.fromLocalFile(ruta_wav_2))
+        self._sonido_ausencia.setLoopCount(-2)
+        self._sonido_ausencia.setVolume(1)
+
+        self._estado_anterior_ausencia = None
 
         self.ciclosTerminados = 0
 
@@ -540,7 +562,7 @@ QScrollArea > QWidget > QWidget {
             "CORRECTA": "#4CAF50",
             "INCORRECTA": "#E53935",
             "ALERTA": "#FF6F00",
-            "SIN DETECCION": "#9E9E9E",
+            "SIN_DETECCION": "#9E9E9E",
         }
         color = colores.get(estado, "#9E9E9E")
         self.estatusTxt.setText(estado)
@@ -590,12 +612,29 @@ QScrollArea > QWidget > QWidget {
         resumen = self.contador_postura.obtener_resumen()
         self.actualizarLabelsContador(resumen)
 
+        if estado == "ALERTA" and self._estado_anterior != "ALERTA":
+            self._sonido_alerta.play()
+
+        elif estado != "ALERTA" and self._estado_anterior == "ALERTA":
+            self._sonido_alerta.stop()
+
+
+
+        if estado == "SIN_DETECCION" and self._estado_anterior != "SIN_DETECCION":
+            self._sonido_ausencia.play()
+        elif estado != "SIN_DETECCION" and self._estado_anterior == "SIN_DETECCION":
+            self._sonido_ausencia.stop()
+
+
+        self._estado_anterior = estado
+
+
+
     def actualizarLabelsContador(self, resumen):
         self.postureGoodTxt2.setText(self.formaterTime(resumen["tiempo_correcta"]))
         self.postureBadTxt2.setText(self.formaterTime(resumen["tiempo_incorrecta"]))
         self.rachaTxt2.setText(self.formaterTime(resumen["racha_actual"]))
 
-        print("cambiado")
 
 
     def formaterTime(self, time):
