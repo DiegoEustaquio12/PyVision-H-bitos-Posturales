@@ -1,7 +1,9 @@
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QImage
 import cv2
-import visonAdapter
+
+from IU.GUI import visonAdapter
+
 
 class VisionWorker(QThread):
     frame_ready = Signal(QImage)
@@ -13,9 +15,11 @@ class VisionWorker(QThread):
 
     def run(self):
         while self._running:
+
             datos = visonAdapter.obtener_estado_postura()
-            print(f"datos: {datos}")
+            #print(f"datos: {datos}")
             if datos is None:
+                self.msleep(10)
                 continue
 
             frame_rgb = cv2.cvtColor(datos["frame"], cv2.COLOR_BGR2RGB)

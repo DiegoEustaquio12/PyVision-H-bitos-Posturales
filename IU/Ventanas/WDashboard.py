@@ -1,11 +1,16 @@
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QAction, QIcon
+from PySide6.QtGui import QAction, QIcon, QPixmap
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
     QSizePolicy, QComboBox, QDialog
 from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
 from IU.Ventanas.Widgets.dialogoTarea import dialogoNuevaTarea
+from IU.Ventanas.Widgets.structureTime import ContadorPostura
+
+from IU.GUI.visionWorker1 import VisionWorker
+from IU.GUI import visonAdapter
+import time
 
 
 class WidDashboard(QWidget):
@@ -29,10 +34,18 @@ class WidDashboard(QWidget):
         layoutDetect = QVBoxLayout(frameDetect)
         layoutDetect.setContentsMargins(12, 15, 25, 10)
 
-        estatusTxt = QLabel()
-        estatusTxt.setText("Postura Correcta")
-        estatusTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        estatusTxt.setStyleSheet(estado1)
+        self.estatusTxt = QLabel()
+        self.estatusTxt.setText("Esperando...")
+        self.estatusTxt.setFixedHeight(45)
+        self.estatusTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.estatusTxt.setStyleSheet("""
+            background:#555;
+            color:white;
+            border-radius:15px;
+            font-size:18px;
+            font-weight:bold;
+            """
+            )
 
 
         widgetTiempos = QWidget()
@@ -52,6 +65,8 @@ class WidDashboard(QWidget):
         frameTiempo2.setStyleSheet('''
         QFrame{
         background-color: #8d0809;
+        border: 1px solid rgba(255,255,255,80);
+        border-radius:20px;
         }
         ''')
         layoutFrame2 = QVBoxLayout(frameTiempo2)
@@ -78,20 +93,32 @@ class WidDashboard(QWidget):
          }
          """)
 
+        linea3 = QFrame()
+        linea3.setFrameShape(QFrame.Shape.VLine)
+        linea3.setFrameShadow(QFrame.Shadow.Sunken)
+        linea3.setFixedWidth(1)
+        linea3.setStyleSheet("""
+                 QFrame{
+                     background-color: #b4b4b4;
+                     border-color: transparent;
+                 }
+                 """)
+
         postureGoodTxt1 = QLabel()
         postureGoodTxt1.setText("Buena Postura")
         postureGoodTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         postureGoodTxt1.setStyleSheet(contador1)
 
 
-        postureGoodTxt2 = QLabel()
-        postureGoodTxt2.setText("5:20")
-        postureGoodTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureGoodTxt2.setStyleSheet(contador1)
+        self.postureGoodTxt2 = QLabel()
+        self.postureGoodTxt2.setText("0:00")
+        self.postureGoodTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.postureGoodTxt2.setStyleSheet(contador1)
+
 
         layoutFrame1.addWidget(postureGoodTxt1)
         layoutFrame1.addWidget(linea)
-        layoutFrame1.addWidget(postureGoodTxt2)
+        layoutFrame1.addWidget(self.postureGoodTxt2)
 
 
         postureBadTxt1 = QLabel()
@@ -99,14 +126,14 @@ class WidDashboard(QWidget):
         postureBadTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
         postureBadTxt1.setStyleSheet(contador2)
 
-        postureBadTxt2 = QLabel()
-        postureBadTxt2.setText("1:30")
-        postureBadTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureBadTxt2.setStyleSheet(contador2)
+        self.postureBadTxt2 = QLabel()
+        self.postureBadTxt2.setText("0:00")
+        self.postureBadTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.postureBadTxt2.setStyleSheet(contador2)
 
         layoutFrame2.addWidget(postureBadTxt1)
         layoutFrame2.addWidget(linea2)
-        layoutFrame2.addWidget(postureBadTxt2)
+        layoutFrame2.addWidget(self.postureBadTxt2)
 
         layoutTiempos.addWidget(frameTiempo1)
         layoutTiempos.addWidget(frameTiempo2)
@@ -114,25 +141,44 @@ class WidDashboard(QWidget):
         frameRacha = QFrame()
         layoutRachaa = QHBoxLayout(frameRacha)
 
+        frameRacha.setStyleSheet('''
+                QFrame{
+                background-color: #black;
+                border: 1px solid rgba(255,255,255,80);
+                border-radius:20px;
+                }
+                ''')
+
         rachaTxt = QLabel()
-        rachaTxt.setText("Racha:          2:05 min")
-        rachaTxt.setStyleSheet(racha)
-        rachaTxt.setFixedWidth(300)
+        rachaTxt.setText("Racha")
+        rachaTxt.setStyleSheet(contador1)
+        rachaTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        #rachaTxt.setFixedWidth(300)
+
+
+        self.rachaTxt2 = QLabel()
+        self.rachaTxt2.setText("0:00")
+        self.rachaTxt2.setStyleSheet(contador1)
+        self.rachaTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        layoutRachaa.addWidget(rachaTxt)
+        layoutRachaa.addWidget(linea3)
+        layoutRachaa.addWidget(self.rachaTxt2)
 
 
         timeSeccionTxt = QLabel()
-        timeSeccionTxt.setText("Tiempo de sesión:    6:50")
+        timeSeccionTxt.setText("Tiempo de sesión:    0:00")
         timeSeccionTxt.setAlignment(Qt.AlignmentFlag.AlignLeft.AlignVCenter)
         timeSeccionTxt.setStyleSheet(contador3)
 
 
 
 
-        layoutDetect.addWidget(estatusTxt, alignment= Qt.AlignmentFlag.AlignTop)
+        layoutDetect.addWidget(self.estatusTxt, alignment= Qt.AlignmentFlag.AlignTop)
         layoutDetect.addSpacing(4)
         layoutDetect.addWidget(widgetTiempos)
         layoutDetect.addSpacing(4)
-        layoutDetect.addWidget(rachaTxt)
+        layoutDetect.addWidget(frameRacha)
         layoutDetect.addStretch()
         layoutDetect.addWidget(timeSeccionTxt)
         layoutDetect.addStretch()
@@ -140,6 +186,28 @@ class WidDashboard(QWidget):
 
 
         frameVision = QFrame()
+        visionLayout = QVBoxLayout(frameVision)
+
+        visonAdapter.iniciar_vision()
+
+        self.labelCamara = QLabel()
+        self.labelCamara.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.labelCamara.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.labelCamara.setMinimumSize(1, 1)  # evita que colapse a 0
+        self.labelCamara.setStyleSheet("""
+                    background: black;
+                    border-radius:20px;
+                """)
+
+        visionLayout.addWidget(self.labelCamara)
+
+        self.vision_worker = None
+        self.contador_postura = ContadorPostura()
+
+        self.activar_vision()
+
+
+
 
         layoutSuperior.addWidget(frameDetect, stretch=4)
         layoutSuperior.addWidget(frameVision, stretch=5)
@@ -251,6 +319,7 @@ QScrollArea > QWidget > QWidget {
         layoutBotones.addWidget(self.buttonMarcar, stretch= 3)
 
         self.buttonAgregar.clicked.connect(self.accionAgregarTarea)
+        self.buttonMarcar.clicked.connect(self.accioneLimpiarCompletas)
 
         layoutTimer.addWidget(tareaTxt)
         layoutTimer.addWidget(self.scrollTareas)
@@ -376,6 +445,8 @@ QScrollArea > QWidget > QWidget {
         right_layout.addWidget(frame_status, stretch=50)
         right_layout.addWidget(bottom_widget, stretch=50)
 
+        self.num = 0
+
     def txtPomodoro(self):
         self.progressTime.set_tiempos(30,15)
         self.modoTxt.setText("Pomodoro Mode")
@@ -435,9 +506,105 @@ QScrollArea > QWidget > QWidget {
             targetas.solicitudEliminar.connect(self.eleminarFrameTarea)
 
     def eleminarFrameTarea(self, targeta):
-        self.contenidoLayout.addWidget(targeta)
+        self.contenidoLayout.removeWidget(targeta)
         self.listaTareas.remove(targeta)
         targeta.deleteLater()
         print(targeta.trabajoLabel.text(), " ah sido elimidado")
+
+    def accioneLimpiarCompletas(self):
+
+        tareas_a_eliminar = [t for t in self.listaTareas if t.completada]
+
+        if tareas_a_eliminar:
+            for tarjeta in tareas_a_eliminar:
+                self.contenidoLayout.removeWidget(tarjeta)
+                self.listaTareas.remove(tarjeta)
+                tarjeta.deleteLater()
+            for tarjeta in tareas_a_eliminar:
+                print(tarjeta)
+
+        else:
+            print("Sin Tareas terminadas")
+
+    def _actualizar_camara(self, qimg):
+        self.labelCamara.setPixmap(
+            QPixmap.fromImage(qimg).scaled(
+                self.labelCamara.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+        )
+
+    def _actualizar_pill(self, estado):
+        colores = {
+            "CORRECTA": "#4CAF50",
+            "INCORRECTA": "#E53935",
+            "ALERTA": "#FF6F00",
+            "SIN DETECCION": "#9E9E9E",
+        }
+        color = colores.get(estado, "#9E9E9E")
+        self.estatusTxt.setText(estado)
+        self.estatusTxt.setStyleSheet(f"""
+            background:{color};
+            color:white;
+            border-radius:20px;
+            font-size:18px;
+            font-weight:bold;
+        """)
+        #self.procesar_estado(estado)
+
+    def closeEvent(self, event):
+        self.vision_worker.stop()
+        time.sleep(0.3)
+        event.accept()
+
+    def prender_camara(self):
+        self.vision_worker.start()
+
+    def activar_vision(self):
+        if self.vision_worker is not None:
+            return
+
+        visonAdapter.iniciar_vision()
+        self.vision_worker = VisionWorker()
+        self.vision_worker.frame_ready.connect(self._actualizar_camara)
+        self.vision_worker.estado_actualizado.connect(self.procesar_estado)
+        self.vision_worker.start()
+
+    def desactivar_camara(self):
+        if self.vision_worker is None:
+            return
+        self.vision_worker.stop()
+        self.vision_worker = None
+        self.contador_postura._ultimo_tiemestamp =None
+
+    def procesar_estado(self, estado):
+        #actualizare el pill
+        self._actualizar_pill(estado)
+
+
+        #alimentar el contador
+        self.contador_postura.registrar_estado(estado)
+
+        #tomar resumen y actualizar labels
+        resumen = self.contador_postura.obtener_resumen()
+        self.actualizarLabelsContador(resumen)
+
+    def actualizarLabelsContador(self, resumen):
+        self.postureGoodTxt2.setText(self.formaterTime(resumen["tiempo_correcta"]))
+        self.postureBadTxt2.setText(self.formaterTime(resumen["tiempo_incorrecta"]))
+        self.rachaTxt2.setText(self.formaterTime(resumen["racha_actual"]))
+
+        print("cambiado")
+
+
+    def formaterTime(self, time):
+
+        minutesRemaining = int(time//60)
+        secondsRemaining = int(time % 60)
+        return f"{minutesRemaining}:{secondsRemaining:02d}"
+
+
+
 
 

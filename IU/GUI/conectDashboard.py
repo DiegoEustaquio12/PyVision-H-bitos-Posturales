@@ -68,7 +68,7 @@ class Ventana(QWidget):
         self.vision_worker = VisionWorker()
         self.vision_worker.frame_ready.connect(self._actualizar_camara)
         self.vision_worker.estado_actualizado.connect(self._actualizar_pill)
-        self.vision_worker.start()
+
 
     # ==========================
     # Slots

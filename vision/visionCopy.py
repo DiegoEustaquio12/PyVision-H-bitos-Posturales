@@ -412,7 +412,7 @@ def main():
 
             # Diccionarioz
             if not resultados.pose_landmarks:
-                estado_postura_dashboard = "SIN_DETECCION"
+                estado_postura_dashboard = "SIN DETECCION"
                 tiempo_postura_dashboard = 0.0
                 ts_inicio_buena_postura = None
             else:
