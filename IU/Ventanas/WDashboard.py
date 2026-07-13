@@ -32,7 +32,7 @@ class WidDashboard(QWidget):
 
         self._sonido_ausencia = QSoundEffect()
         base_path_deteccion = os.path.dirname(os.path.abspath(__file__))
-        ruta_wav_2 = os.path.normpath(os.path.join(base_path_deteccion, "..", "sounds", "sinDeteccion.wav"))
+        ruta_wav_2 = os.path.normpath(os.path.join(base_path_deteccion, "..", "sounds", "sinDeteccion2.wav"))
         self._sonido_ausencia.setSource(QUrl.fromLocalFile(ruta_wav_2))
         self._sonido_ausencia.setLoopCount(-2)
         self._sonido_ausencia.setVolume(1)
