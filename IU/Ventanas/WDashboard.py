@@ -189,7 +189,7 @@ class WidDashboard(QWidget):
 
 
         timeSeccionTxt = QLabel()
-        timeSeccionTxt.setText("Tiempo de sesión:    0:00")
+        timeSeccionTxt.setText("Primera fase")
         timeSeccionTxt.setAlignment(Qt.AlignmentFlag.AlignLeft.AlignVCenter)
         timeSeccionTxt.setStyleSheet(contador3)
 
