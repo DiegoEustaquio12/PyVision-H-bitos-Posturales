@@ -278,6 +278,48 @@ def dibujar_hud_metricas(
     cv2.putText(frame, estado_texto, (25, 218), fuente, 0.65, color_estado, 2)
 
 
+# seleccion de camara
+def listar_y_seleccionar_camara(max_indice: int = 10) -> int:
+  
+    camaras_disponibles = []
+
+    print("Buscando camaras disponibles...")
+    for indice in range(max_indice):
+        cap_test = cv2.VideoCapture(indice, cv2.CAP_ANY)
+        if cap_test.isOpened():
+            # leer resolucion para mostrar info util
+            ancho = int(cap_test.get(cv2.CAP_PROP_FRAME_WIDTH))
+            alto  = int(cap_test.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            camaras_disponibles.append((indice, ancho, alto))
+            cap_test.release()
+
+    if not camaras_disponibles:
+        print("ERROR: No se encontro ninguna camara conectada.")
+        print("Usando camara 0 por defecto.")
+        return 0
+
+    if len(camaras_disponibles) == 1:
+        idx = camaras_disponibles[0][0]
+        print(f"Se encontro 1 camara disponible (indice {idx}). Seleccionada automaticamente.")
+        return idx
+
+    # multiples camaras — mostrar lista y pedir seleccion
+    print(f"\nSe encontraron {len(camaras_disponibles)} camaras disponibles:\n")
+    for i, (idx, ancho, alto) in enumerate(camaras_disponibles):
+        print(f"  [{i}] Camara {idx}  ({ancho}x{alto})")
+
+    print()
+    while True:
+        entrada = input(f"Selecciona una camara (0-{len(camaras_disponibles) - 1}): ").strip()
+        if entrada.isdigit():
+            seleccion = int(entrada)
+            if 0 <= seleccion < len(camaras_disponibles):
+                indice_seleccionado = camaras_disponibles[seleccion][0]
+                print(f"Camara {indice_seleccionado} seleccionada.")
+                return indice_seleccionado
+        print("Opcion no valida. Intenta de nuevo.")
+
+
 def main():
     global _datos_dashboard
     with open(MODEL_PATH, "rb") as f:
@@ -291,7 +333,9 @@ def main():
         output_segmentation_masks=False,
     )
 
-    cap = cv2.VideoCapture(0, cv2.CAP_ANY)
+    # seleccionar camara antes de iniciar la captura
+    indice_camara = listar_y_seleccionar_camara()
+    cap = cv2.VideoCapture(indice_camara, cv2.CAP_ANY)
 
     # calidad y los fps
     if cap.isOpened():
