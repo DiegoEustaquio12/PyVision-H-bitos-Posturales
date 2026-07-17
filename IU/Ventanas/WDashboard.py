@@ -193,6 +193,15 @@ class WidDashboard(QWidget):
         timeSeccionTxt.setAlignment(Qt.AlignmentFlag.AlignLeft.AlignVCenter)
         timeSeccionTxt.setStyleSheet(contador3)
 
+        self.visionButton = QPushButton()
+        self.visionButton.setText("Vision")
+        self.visionButton.setIcon(QIcon("pictures/play.svg"))
+        self.visionButton.setCheckable(True)
+        self.visionButton.toggled.connect(self.toggle_button_camara)
+
+
+
+
 
 
 
@@ -203,14 +212,14 @@ class WidDashboard(QWidget):
         layoutDetect.addWidget(frameRacha)
         layoutDetect.addStretch()
         layoutDetect.addWidget(timeSeccionTxt)
-        layoutDetect.addStretch()
+        layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
 
 
 
         frameVision = QFrame()
         visionLayout = QVBoxLayout(frameVision)
 
-        visonAdapter.iniciar_vision()
+        #visonAdapter.iniciar_vision()
 
         self.labelCamara = QLabel()
         self.labelCamara.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -226,7 +235,7 @@ class WidDashboard(QWidget):
         self.vision_worker = None
         self.contador_postura = ContadorPostura()
 
-        self.activar_vision()
+        #self.activar_vision()
 
 
 
@@ -467,7 +476,6 @@ QScrollArea > QWidget > QWidget {
         right_layout.addWidget(frame_status, stretch=50)
         right_layout.addWidget(bottom_widget, stretch=50)
 
-        self.num = 0
 
     def txtPomodoro(self):
         self.progressTime.set_tiempos(30,15)
@@ -580,8 +588,7 @@ QScrollArea > QWidget > QWidget {
         time.sleep(0.3)
         event.accept()
 
-    def prender_camara(self):
-        self.vision_worker.start()
+
 
     def activar_vision(self):
         if self.vision_worker is not None:
@@ -642,6 +649,12 @@ QScrollArea > QWidget > QWidget {
         minutesRemaining = int(time//60)
         secondsRemaining = int(time % 60)
         return f"{minutesRemaining}:{secondsRemaining:02d}"
+
+    def toggle_button_camara(self, checked):
+        if checked:
+            self.activar_vision()
+        else:
+            self.desactivar_camara()
 
 
 
