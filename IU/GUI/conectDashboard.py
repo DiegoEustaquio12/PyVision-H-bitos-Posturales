@@ -99,11 +99,6 @@ class Ventana(QWidget):
             font-weight:bold;
         """)
 
-    def closeEvent(self, event):
-        self.vision_worker.stop()
-        time.sleep(0.3)
-        event.accept()
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

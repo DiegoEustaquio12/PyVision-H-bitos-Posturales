@@ -465,7 +465,7 @@ def main():
 
 
     cap.release()
-    cv2.destroyAllWindows()
+
 
 
 def obtener_datos_dashboard():
@@ -473,14 +473,15 @@ def obtener_datos_dashboard():
 
 def iniciar_vision():
     global _hilo_vision, _corriendo
+    if _hilo_vision is not None and _hilo_vision.is_alive():
+        return
     _corriendo = True
     _hilo_vision = threading.Thread(target=main, daemon=True)
     _hilo_vision.start()
 
 def detener_vision():
-    global _hilo_vision
+    global _hilo_vision, _corriendo
     _corriendo = False
-
-
-if __name__ == "__main__":
-    main()
+    if _hilo_vision is not None:
+        _hilo_vision.join(timeout=0.2)
+        _hilo_vision = None

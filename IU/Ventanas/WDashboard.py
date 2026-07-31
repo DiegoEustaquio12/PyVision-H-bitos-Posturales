@@ -20,6 +20,7 @@ from PySide6.QtMultimedia import QSoundEffect
 class WidDashboard(QWidget):
     def __init__(self):
         super().__init__()
+        self.ciclosTerminados = 0
 
         self._sonido_alerta = QSoundEffect()
         base_path = os.path.dirname(os.path.abspath(__file__))
@@ -39,7 +40,6 @@ class WidDashboard(QWidget):
 
         self._estado_anterior_ausencia = None
 
-        self.ciclosTerminados = 0
 
         right_layout = QVBoxLayout(self)
         right_layout.setContentsMargins(0, 0, 15, 0)
@@ -64,7 +64,7 @@ class WidDashboard(QWidget):
             background:#555;
             color:white;
             border-radius:15px;
-            font-size:18px;
+            font-size:20px;
             font-weight:bold;
             """
             )
@@ -217,6 +217,11 @@ class WidDashboard(QWidget):
 
 
         frameVision = QFrame()
+        frameVision.setStyleSheet("""
+        QFrame{
+        border-color: transparent;
+        }
+        """)
         visionLayout = QVBoxLayout(frameVision)
 
         #visonAdapter.iniciar_vision()
@@ -225,6 +230,9 @@ class WidDashboard(QWidget):
         self.labelCamara.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.labelCamara.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.labelCamara.setMinimumSize(1, 1)  # evita que colapse a 0
+        self.labelCamara.setPixmap(QPixmap("pictures/placeholder.png").scaled(440, 440,
+                                                                    Qt.AspectRatioMode.KeepAspectRatio,
+                                                                    Qt.TransformationMode.SmoothTransformation))
         self.labelCamara.setStyleSheet("""
                     background: black;
                     border-radius:20px;
@@ -520,8 +528,10 @@ QScrollArea > QWidget > QWidget {
     def al_cambiar_fase(self, working):
         if working:
             self.estatatusModo.setText("Trabajando")
+            #self.activar_vision()
         else:
             self.estatatusModo.setText("Descansando")
+            #self.desactivar_camara()
 
     def cambioCheckout(self, targeta, completado):
         print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
@@ -583,10 +593,6 @@ QScrollArea > QWidget > QWidget {
         """)
         #self.procesar_estado(estado)
 
-    def closeEvent(self, event):
-        self.vision_worker.stop()
-        time.sleep(0.3)
-        event.accept()
 
 
 
@@ -606,6 +612,8 @@ QScrollArea > QWidget > QWidget {
         self.vision_worker.stop()
         self.vision_worker = None
         self.contador_postura._ultimo_tiemestamp =None
+
+        self.mostrar_placeholder_camera()
 
     def procesar_estado(self, estado):
         #actualizare el pill
@@ -650,13 +658,31 @@ QScrollArea > QWidget > QWidget {
         secondsRemaining = int(time % 60)
         return f"{minutesRemaining}:{secondsRemaining:02d}"
 
-    def toggle_button_camara(self, checked):
+    def toggle_button_camara(self, checked): #boton prendido/apagado MODULO VISION
         if checked:
             self.activar_vision()
         else:
             self.desactivar_camara()
 
+    def closeEvent(self, event):
+        self.desactivar_camara()
+        event.accept()
 
+
+    def mostrar_placeholder_camera(self):
+        self.labelCamara.setPixmap(QPixmap("pictures/placeholder.png").scaled(440, 440,
+                                                                              Qt.AspectRatioMode.KeepAspectRatio,
+                                                                              Qt.TransformationMode.SmoothTransformation))
+        self.estatusTxt.setText("Esperando...")
+        self.estatusTxt.setStyleSheet("""
+                    background:#555;
+                    color:white;
+                    border-radius:20px;
+                    font-size:18px;
+                    font-weight:bold;
+                    """)
+        self._sonido_ausencia.stop()
+        self._sonido_alerta.stop()
 
 
 
