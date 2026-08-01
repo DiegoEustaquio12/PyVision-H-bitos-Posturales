@@ -19,6 +19,10 @@ class tareaTarget(QFrame):
         border: 1px solid rgba(255,255,255,80);
         
          }
+         
+         QFrame::hover {
+         background-color: rgba(255,255,255,60);
+         }
         ''')
 
 
@@ -36,16 +40,7 @@ class tareaTarget(QFrame):
         
         ''')
         self.checkTrabajo = QCheckBox()
-        self.checkTrabajo.setStyleSheet('''
-        
-        QCheckBox {
-                color: white;
-            }
-         QCheckBox::indicator {
-                width: 30px;
-                height: 15px;
-            }
-        ''')
+
 
         self.iconNormal = QIcon("pictures/delete.svg")
         self.iconHover = QIcon("pictures/deleteRed.svg")
@@ -108,12 +103,16 @@ class tareaTarget(QFrame):
                     background-color: transparent;
                     ''')
             self.setStyleSheet('''
-            QFrame{
-            background-color: rgba(255,255,255,40);
-            border: 1px solid rgba(255,255,255,80);
-            border-color: transparent;
-            }
-            ''')
+                    QFrame{
+                    background-color: rgba(255,255,255,40);
+                    border: 1px solid rgba(255,255,255,80);
+
+                     }
+
+                     QFrame::hover {
+                     background-color: rgba(255,255,255,60);
+                     }
+                    ''')
     def eliminarTarea(self):
         self.solicitudEliminar.emit(self)
 

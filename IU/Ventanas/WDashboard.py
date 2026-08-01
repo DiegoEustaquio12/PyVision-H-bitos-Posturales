@@ -49,7 +49,7 @@ class WidDashboard(QWidget):
         frame_status = QFrame()
 
         layoutSuperior = QHBoxLayout(frame_status)
-        layoutSuperior.setContentsMargins(5, 5, 5, 5)
+        layoutSuperior.setContentsMargins(9, 15, 5, 15)
         layoutSuperior.setSpacing(10)
 
         frameDetect = QFrame(objectName = "frameInterno")
@@ -58,13 +58,13 @@ class WidDashboard(QWidget):
 
         self.estatusTxt = QLabel()
         self.estatusTxt.setText("Esperando...")
-        self.estatusTxt.setFixedHeight(45)
+        self.estatusTxt.setFixedHeight(50)
         self.estatusTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.estatusTxt.setStyleSheet("""
             background:#555;
             color:white;
-            border-radius:15px;
-            font-size:20px;
+            border-radius:20px;
+            font-size:25px;
             font-weight:bold;
             """
             )
@@ -381,6 +381,9 @@ QScrollArea > QWidget > QWidget {
         self.estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.estatatusModo.setStyleSheet(modo1)
 
+        self.timerPausado = True
+        self.modoTrabajo= True
+
         self.buttonStart = QPushButton()
         self.buttonStart.setIcon(QIcon("pictures/play.svg"))
         self.buttonStart.setIconSize(QSize(21, 21))
@@ -512,11 +515,21 @@ QScrollArea > QWidget > QWidget {
             self.buttonRefresh.setEnabled(True)
             self.buttonStart.setIcon(QIcon("pictures/play.svg"))
             self.buttonStart.setIconSize(QSize(21, 21))
+
+            self.timerPausado = True
+
+            self.actualizar_estado_vision()
+
+
         else:
             self.progressTime.iniciar()
             self.buttonRefresh.setEnabled(False)
             self.buttonStart.setIcon(QIcon("pictures/stop.svg"))
             self.buttonStart.setIconSize(QSize(21, 21))
+
+
+            self.timerPausado = False
+            self.actualizar_estado_vision()
 
     def accionBotonRefresh(self):
         self.progressTime.reiniciar()
@@ -528,10 +541,13 @@ QScrollArea > QWidget > QWidget {
     def al_cambiar_fase(self, working):
         if working:
             self.estatatusModo.setText("Trabajando")
-            #self.activar_vision()
+            self.modoTrabajo = True
+
         else:
             self.estatatusModo.setText("Descansando")
-            #self.desactivar_camara()
+            self.modoTrabajo = False
+
+        self.actualizar_estado_vision()
 
     def cambioCheckout(self, targeta, completado):
         print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
@@ -588,7 +604,7 @@ QScrollArea > QWidget > QWidget {
             background:{color};
             color:white;
             border-radius:20px;
-            font-size:18px;
+            font-size:25px;
             font-weight:bold;
         """)
         #self.procesar_estado(estado)
@@ -678,11 +694,22 @@ QScrollArea > QWidget > QWidget {
                     background:#555;
                     color:white;
                     border-radius:20px;
-                    font-size:18px;
+                    font-size:25px;
                     font-weight:bold;
                     """)
         self._sonido_ausencia.stop()
         self._sonido_alerta.stop()
+
+    def actualizar_estado_vision(self):
+        debePrender = (self.modoTrabajo == True) and not self.timerPausado
+
+        if debePrender and self.vision_worker is None:
+            self.activar_vision()
+            print("Vision Activa")
+        elif not debePrender and self.vision_worker is not None:
+            self.desactivar_camara()
+            print("Vision Desactivada")
+
 
 
 
