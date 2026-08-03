@@ -33,6 +33,10 @@ PERFILES_USUARIO = {
         "min_ratio_altura_tronco" :  1.00,
         "min_ratio_encorvamiento" :  0.42,
         "min_ratio_apertura"      :  1.95,
+        "max_extension_cabeza_arriba" : 0.06,
+        "min_ratio_cabeza_hombros"    : 0.15,
+        "max_asimetria_cabeza"        : 2.5,
+        "max_ratio_encorvamiento"     : 0.58,
     },
     "nino": {
         "max_inclinacion_cabeza"  : 18.0,
@@ -41,6 +45,10 @@ PERFILES_USUARIO = {
         "min_ratio_altura_tronco" :  0.85,
         "min_ratio_encorvamiento" :  0.38,
         "min_ratio_apertura"      :  1.75,
+        "max_extension_cabeza_arriba" : 0.08,
+        "min_ratio_cabeza_hombros"    : 0.12,
+        "max_asimetria_cabeza"        : 2.8,
+        "max_ratio_encorvamiento"     : 0.55,
     },
 }
 
@@ -55,6 +63,12 @@ PUNTOS_APERTURA         = 15  # Secundario — apertura de pecho
 PUNTOS_HOMBROS_BASE     = 10  
 UMBRAL_PUNTOS_MALA_POSTURA = 20
 
+# puntos para posturas antinaturales (evaluacion independiente)
+PUNTOS_CABEZA_ARRIBA      = 30  # cabeza hacia arriba antinatural
+PUNTOS_EXTENSION_EXCESIVA = 25  # rectitud anormalmente alta (cabeza echada atras)
+PUNTOS_CABEZA_ABAJO       = 25  # cabeza caida hacia adelante/abajo
+UMBRAL_POSTURA_ANTINATURAL = 25
+
 #alerta tras 5 segundos continuos de mala postura
 SEGUNDOS_PARA_ACTIVAR_ALERTA = 5.0
 
@@ -65,12 +79,16 @@ TAMANO_BUFFER_TRONCO  = 5
 COLOR_CORRECTO   = (40, 220, 100)
 COLOR_INCORRECTO = (50, 50, 240)
 COLOR_ALERTA     = (0, 165, 255)
+COLOR_ANTINATURAL = (200, 50, 255)
 BLANCO           = (255, 255, 255)
 AMARILLO         = (0, 230, 230)
 OSCURO           = (20, 20, 20)
 GRIS_CLARO       = (200, 200, 200)
 
 OFFSET_SUPERIOR_HOMBRO = 0.30
+
+# rendimiento — procesar deteccion cada N frames
+INTERVALO_DETECCION = 2
 
 # Índices de landmarks de MediaPipe Pose
 IDX_NARIZ      = 0
@@ -179,6 +197,48 @@ def evaluar_postura(
 
     return es_mala_postura_frame, puntuacion_total
 
+
+#evaluacion de postura antinatural — independiente del sistema de puntos existente
+def evaluar_postura_antinatural(
+    nariz: tuple,
+    oreja_izq: tuple,
+    oreja_der: tuple,
+    centro_hombros: tuple,
+    ancho_cabeza: float,
+    ratio_encorvamiento: float,
+) -> tuple:
+    """Detecta posturas antinaturales: cabeza muy arriba, muy abajo o extensión excesiva."""
+    u = umbrales
+    puntos = 0
+    detalles = []
+
+    if ancho_cabeza < 10:
+        return False, 0, detalles
+
+    centro_orejas_y = (oreja_izq[1] + oreja_der[1]) / 2
+
+    # cabeza hacia arriba — nariz por encima de las orejas
+    extension_arriba = (centro_orejas_y - nariz[1]) / ancho_cabeza
+    if extension_arriba > u["max_extension_cabeza_arriba"]:
+        puntos += PUNTOS_CABEZA_ARRIBA
+        detalles.append("CABEZA ARRIBA")
+
+    # extension excesiva — rectitud anormalmente alta (cabeza echada hacia atras)
+    if ratio_encorvamiento > u["max_ratio_encorvamiento"]:
+        puntos += PUNTOS_EXTENSION_EXCESIVA
+        detalles.append("EXTENSION EXCESIVA")
+
+    # cabeza caida — nariz muy cerca o debajo de la linea de hombros
+    distancia_nariz_hombros = centro_hombros[1] - nariz[1]
+    ratio_caida = distancia_nariz_hombros / ancho_cabeza
+    if ratio_caida < u["min_ratio_cabeza_hombros"]:
+        puntos += PUNTOS_CABEZA_ABAJO
+        detalles.append("CABEZA ABAJO")
+
+    es_antinatural = puntos >= UMBRAL_POSTURA_ANTINATURAL
+    return es_antinatural, puntos, detalles
+
+
 class GestorAlertaPostura:
     """Temporiza alertas: solo se activa tras N segundos continuos de mala postura."""
 
@@ -236,9 +296,11 @@ def dibujar_hud_metricas(
     estado_texto, color_estado,
     alerta_activa,
 ):
-    capa_sombra = frame.copy()
-    cv2.rectangle(capa_sombra, (15, 15), (430, 235), OSCURO, -1)
-    cv2.addWeighted(capa_sombra, 0.72, frame, 0.28, 0, frame)
+    # optimizado: solo copiar la region del HUD en vez del frame completo
+    roi = frame[15:235, 15:430]
+    capa_sombra = roi.copy()
+    capa_sombra[:] = OSCURO
+    cv2.addWeighted(capa_sombra, 0.72, roi, 0.28, 0, roi)
 
     cv2.putText(frame, f"MODULO VISION: ANALISIS FRONTAL  [{perfil_activo.upper()}]",
                 (25, 40), fuente, 0.50, AMARILLO, 2)
@@ -337,11 +399,12 @@ def main():
     indice_camara = listar_y_seleccionar_camara()
     cap = cv2.VideoCapture(indice_camara, cv2.CAP_ANY)
 
-    # calidad y los fps
+    # calidad y los fps — optimizado a 720p 24fps
     if cap.isOpened():
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-        cap.set(cv2.CAP_PROP_FPS, 30)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        cap.set(cv2.CAP_PROP_FPS, 24)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     print(f"Módulo de Visión de postura inicializado. Perfil activo: {PERFIL_ACTIVO.upper()}")
     print("Presiona 'q' en la ventana para salir.")
@@ -350,6 +413,13 @@ def main():
     
     # Variable persistente para controlar el inicio de la buena postura
     ts_inicio_buena_postura = None
+
+    # fuente del HUD (se inicializa una sola vez fuera del bucle)
+    fuente = cv2.FONT_HERSHEY_SIMPLEX
+
+    # contador para saltar frames en la deteccion de pose
+    contador_frames = 0
+    ultimo_resultado = None
 
     with vision.PoseLandmarker.create_from_options(opciones_vision) as landmarker:
         while True:
@@ -361,11 +431,14 @@ def main():
             frame = cv2.flip(frame, 1)
             alto_frame, ancho_frame = frame.shape[:2]
 
-            # MediaPipe formato RGB
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            mp_img    = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+            # deteccion de pose cada N frames para optimizar rendimiento
+            contador_frames += 1
+            if contador_frames % INTERVALO_DETECCION == 0 or ultimo_resultado is None:
+                frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                mp_img    = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame_rgb)
+                ultimo_resultado = landmarker.detect(mp_img)
 
-            resultados = landmarker.detect(mp_img)
+            resultados = ultimo_resultado
 
             # Valores por defecto si no hay nada
             estado_texto        = "Buscando cuerpo..."
@@ -378,6 +451,8 @@ def main():
             ratio_apertura      = 0.0
             puntuacion_postura  = 0.0
             alerta_activa       = False
+            es_antinatural      = False
+            detalles_antinatural = []
 
             if resultados.pose_landmarks:
                 landmarks = resultados.pose_landmarks[0]
@@ -429,9 +504,31 @@ def main():
                     tilt_hombros        = tilt_hombros,
                 )
 
+                # deteccion de posturas antinaturales (independiente)
+                es_antinatural, puntos_antinatural, detalles_antinatural = evaluar_postura_antinatural(
+                    nariz               = nariz,
+                    oreja_izq           = oreja_izq,
+                    oreja_der           = oreja_der,
+                    centro_hombros      = centro_hombros,
+                    ancho_cabeza        = ancho_cabeza,
+                    ratio_encorvamiento = ratio_encorvamiento,
+                )
+
+                # combinar — postura antinatural tambien cuenta como mala postura
+                if es_antinatural:
+                    es_mala_postura_frame = True
+                    puntuacion_postura = min(100, puntuacion_postura + puntos_antinatural)
+
                 alerta_activa = gestor_alerta.actualizar(es_mala_postura_frame)
 
-                if alerta_activa:
+                if es_antinatural:
+                    if alerta_activa:
+                        estado_texto = "ALERTA: Postura antinatural"
+                        color_estado = COLOR_ALERTA
+                    else:
+                        estado_texto = "ANTINATURAL: " + ", ".join(detalles_antinatural)
+                        color_estado = COLOR_ANTINATURAL
+                elif alerta_activa:
                     estado_texto = "ALERTA: Corrige tu postura"
                     color_estado = COLOR_ALERTA
                 elif es_mala_postura_frame:
@@ -450,7 +547,9 @@ def main():
                     color_estado,
                 )
 
-            # Diccionarioz
+            # Diccionarioz para el backend
+            # Las posturas antinaturales ahora se emiten como "INCORRECTA" para el dashboard,
+            # manteniendo la compatibilidad con el backend
             if not resultados.pose_landmarks:
                 estado_postura_dashboard = "SIN_DETECCION"
                 tiempo_postura_dashboard = 0.0
@@ -470,21 +569,10 @@ def main():
                         ts_inicio_buena_postura = time.monotonic()
                     tiempo_postura_dashboard = round(time.monotonic() - ts_inicio_buena_postura, 2)
 
-            # >> NOTA INTERNA DE BACKEND <<
-            # En esta sección del flujo ya tienes disponibles:
-            # - `estado_postura_dashboard` (String)
-            # - `tiempo_postura_dashboard` (Float en segundos)
-            # Puedes enviarlas por WebSockets, un cliente MQTT, o una cola de tareas.
-            # ========================================================
-
-            # =====================================================================
-            # >>> AQUÍ SE ESCRIBEN LOS DATOS EN TIEMPO REAL EN LA VARIABLE GLOBAL <<<
-            # =====================================================================
             _datos_dashboard["estado_postura"] = estado_postura_dashboard
             _datos_dashboard["tiempo_postura"] = tiempo_postura_dashboard
 
             # Textos
-            fuente = cv2.FONT_HERSHEY_SIMPLEX
             dibujar_hud_metricas(
                 frame, fuente,
                 perfil_activo       = PERFIL_ACTIVO,
@@ -500,6 +588,25 @@ def main():
                 color_estado        = color_estado,
                 alerta_activa       = alerta_activa,
             )
+
+            # indicador visual de postura antinatural en pantalla
+            if es_antinatural:
+                etiqueta = "POSTURA ANTINATURAL: " + ", ".join(detalles_antinatural)
+                tam_texto = cv2.getTextSize(etiqueta, fuente, 0.55, 2)[0]
+                pos_x = ancho_frame - tam_texto[0] - 25
+                pos_y = alto_frame - 30
+                # fondo semitransparente para el indicador
+                y1 = max(0, pos_y - tam_texto[1] - 10)
+                y2 = min(alto_frame, pos_y + 10)
+                x1 = max(0, pos_x - 10)
+                x2 = min(ancho_frame, pos_x + tam_texto[0] + 10)
+                roi_ant = frame[y1:y2, x1:x2]
+                if roi_ant.size > 0:
+                    sombra_ant = roi_ant.copy()
+                    sombra_ant[:] = OSCURO
+                    cv2.addWeighted(sombra_ant, 0.75, roi_ant, 0.25, 0, roi_ant)
+                cv2.putText(frame, etiqueta, (pos_x, pos_y),
+                            fuente, 0.55, COLOR_ANTINATURAL, 2)
 
             cv2.imshow("PyVision - detector de postura", frame)
 
