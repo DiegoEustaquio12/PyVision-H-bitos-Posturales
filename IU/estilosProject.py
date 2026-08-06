@@ -28,7 +28,7 @@ estilo1 = '''
     background-color: #393a41;
     border-radius: 35px;
     }    
-
+    
 
   
 '''
@@ -155,5 +155,60 @@ QScrollBar::add-page:vertical,
 QScrollBar::sub-page:vertical {
     background: transparent;
 }
+
+'''
+
+dialogo = '''
+         QDialog{
+            background:#202124;
+        }
+        QFrame{
+        background: transparent;
+        border: none;
+        }
+
+        QLabel#titulo{
+            color:white;
+            font-size:22px;
+            font-weight:700;
+        }
+
+        QLabel{
+            color:white;
+            font-size:14px;
+            font-weight:700;
+        }
+
+        QLineEdit{
+            background:#2B2D31;
+            border:2px solid #3A3D42;
+            border-radius:12px;
+            padding:10px;
+            color:white;
+            font-size:15px;
+        }
+
+        QLineEdit:focus{
+            border:2px solid #4F8EF7;
+        }
+
+        QPushButton{
+            background:#4F8EF7;
+            color:white;
+            border:none;
+            border-radius:12px;
+            padding:12px;
+            font-size:15px;
+            font-weight:bold;
+        }
+
+        QPushButton:hover{
+            background:#6AA5FF;
+        }
+
+        QPushButton:pressed{
+            background:#2F6FE5;
+        }
+
 
 '''

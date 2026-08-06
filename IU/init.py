@@ -18,7 +18,7 @@ class PyVisionWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(" ")
         self.setWindowIcon(QIcon("pictures/logoLab.svg"))
-        self.setMinimumSize(1100, 680)
+        self.setMinimumSize(1100, 700)
         self.setStyleSheet(estilo1)
 
         # Widget central
@@ -27,7 +27,7 @@ class PyVisionWindow(QMainWindow):
 
         # Layout raíz: horizontal (sidebar | contenido)
         root_layout = QHBoxLayout(central)
-        root_layout.setContentsMargins(5, 0, 0, 15)
+        root_layout.setContentsMargins(5, 10, 0, 15)
         root_layout.setSpacing(10)
 
         # --- Frame 1: Sidebar ---

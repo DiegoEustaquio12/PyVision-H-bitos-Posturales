@@ -6,6 +6,7 @@ from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
 from IU.Ventanas.Widgets.dialogoTarea import dialogoNuevaTarea
+from IU.Ventanas.Widgets.dialogNewSetTime import dialogNewTime
 from IU.Ventanas.Widgets.structureTime import ContadorPostura
 
 from IU.GUI.visionWorker1 import VisionWorker
@@ -439,18 +440,25 @@ QScrollArea > QWidget > QWidget {
         self.modoTxt.setStyleSheet(modo1)
 
 
-        selecMenu = QMenu(self)
-        accionPomodoro = selecMenu.addAction("Pomodoro")
-        accionEnfoque = selecMenu.addAction("Enfoque")
-        accionPredeterminado = selecMenu.addAction("Predeterminado")
+        self.selecMenu = QMenu(self)
+        self.accionPomodoro = self.selecMenu.addAction("Recomendación 1")
+        self.accionEnfoque = self.selecMenu.addAction("Recomendación 2")
 
-        accionPomodoro.triggered.connect(self.txtPomodoro)
-        accionEnfoque.triggered.connect(self.txtEnfoque)
-        accionPredeterminado.triggered.connect(self.txtPredeterminado)
+        self.separador = self.selecMenu.addSeparator()
+        self.accionAgregar = self.selecMenu.addAction("Agregar")
+
+        self.listaSets = []
+        self.listaSets.append(self.accionPomodoro)
+        self.listaSets.append(self.accionEnfoque)
+        self.listaSets.append(self.accionAgregar)
+
+        self.accionPomodoro.triggered.connect(lambda :self.selectorTiempo("Recomendacion 1", 50, 25))
+        self.accionEnfoque.triggered.connect(lambda : self.selectorTiempo("Recomendacion 2", 40, 20))
+        self.accionAgregar.triggered.connect(self.agregarSetTiempos)
 
 
 
-        selecMenu.setStyleSheet("""
+        self.selecMenu.setStyleSheet("""
         QMenu {
             background-color: #2b2d31;
             color: white;
@@ -465,7 +473,7 @@ QScrollArea > QWidget > QWidget {
             background-color: #5865F2;
         }
         """)
-        buttonMode.setMenu(selecMenu)
+        buttonMode.setMenu(self.selecMenu)
         buttonMode.show()
 
 
@@ -474,11 +482,11 @@ QScrollArea > QWidget > QWidget {
         layoutSelect.addWidget(buttonMode, stretch= 1)
 
         layoutPomodoro.addStretch()
-        layoutPomodoro.addWidget(self.progressTime, stretch= 4)
+        layoutPomodoro.addWidget(self.progressTime)
         layoutPomodoro.addStretch()
-        layoutPomodoro.addWidget(widgetStart, stretch= 1)
+        layoutPomodoro.addWidget(widgetStart)
 
-        layoutPomodoro.addWidget(SelectModeBar, stretch= 1)
+        layoutPomodoro.addWidget(SelectModeBar)
 
 
         bottom_layout.addWidget(frame_timer, stretch=3)
@@ -505,6 +513,13 @@ QScrollArea > QWidget > QWidget {
     def txtPredeterminado(self):
         self.progressTime.set_tiempos(15, 10)
         self.modoTxt.setText("Predeterminado Mode")
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.buttonRefresh.setEnabled(True)
+
+    def selectorTiempo(self, etiqueta : str,  minTrabajo : int, minDescanso : int):
+        self.progressTime.set_tiempos(minTrabajo, minDescanso)
+        self.modoTxt.setText(etiqueta)
         self.buttonStart.setIcon(QIcon("pictures/play.svg"))
         self.buttonStart.setIconSize(QSize(21, 21))
         self.buttonRefresh.setEnabled(True)
@@ -549,11 +564,31 @@ QScrollArea > QWidget > QWidget {
 
         self.actualizar_estado_vision()
 
+    def agregarSetTiempos(self):
+        dialogoNuevoTiempos = dialogNewTime(self)
+        if dialogoNuevoTiempos.exec():
+
+            nombreset = dialogoNuevoTiempos.nombreSet
+            segTrabajo = dialogoNuevoTiempos.setTrabajo
+            segDescanso = dialogoNuevoTiempos.setDescanso
+
+
+
+            newSet = QAction(nombreset, self)
+            self.selecMenu.insertAction(self.separador, newSet)
+
+            newSet.triggered.connect(lambda: self.selectorTiempo(dialogoNuevoTiempos.nombreSet, segTrabajo, segDescanso))
+
+            self.listaSets.append(newSet)
+            for i in self.listaSets:
+                print(i)
+
     def cambioCheckout(self, targeta, completado):
         print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
 
     def accionAgregarTarea(self):
         dialogNewTarea = dialogoNuevaTarea(self)
+
         if dialogNewTarea.exec():
             targetas = tareaTarget(texto= dialogNewTarea.texto_resultado)
             self.contenidoLayout.addWidget(targetas)
