@@ -14,6 +14,7 @@ from PySide6.QtWidgets import (
 )
 import sys
 from PySide6.QtWidgets import QApplication
+from IU.estilosProject import dialogSetTiempo
 
 
 
@@ -29,85 +30,7 @@ class dialogNewTime(QDialog):
         self.setWindowTitle(" ")
         self.setFixedSize(400, 535)
 
-        self.setStyleSheet("""
-        QDialog{
-            background:#202124;
-        }
-
-        QLabel#title{
-            color:white;
-            font-size:24px;
-            font-weight:700;
-        }
-
-        QLabel#subtitle{
-            color:#B8B8B8;
-            font-size:18px;
-            font-weight:700;
-        }
-
-        QLabel{
-            color:white;
-            font-size:15px;
-            font-weight:600;
-        }
-
-        QLineEdit{
-            background:#2B2D31;
-            border:2px solid #3A3D42;
-            border-radius:12px;
-            padding:10px;
-            color:white;
-            font-size:15px;
-        }
-
-        QLineEdit:focus{
-            border:2px solid #4F8EF7;
-        }
-
-        QSpinBox{
-            background:#2B2D31;
-            border:2px solid #3A3D42;
-            border-radius:12px;
-
-            color:white;
-            font-size:26px;
-            font-weight:bold;
-
-            min-width:120px;
-            min-height:45px;
-        }
-
-        QSpinBox:focus{
-            border:2px solid #4F8EF7;
-        }
-
-        QSpinBox::up-button,
-        QSpinBox::down-button{
-            width:25px;
-            height:30px;
-            }
-        
-
-
-        QPushButton{
-            background:#4F8EF7;
-            color:white;
-            border:none;
-            border-radius:12px;
-            padding:12px;
-            font-size:15px;
-            font-weight:bold;
-        }
-
-        QPushButton:hover{
-            background:#6AA5FF;
-        }
-
-        QPushButton:pressed{
-            background:#2F6FE5;
-        }
-        """)
+        self.setStyleSheet(dialogSetTiempo)
 
         mainLayout = QVBoxLayout(self)
         mainLayout.setContentsMargins(25, 20, 25, 20)

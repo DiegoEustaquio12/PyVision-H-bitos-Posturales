@@ -17,6 +17,7 @@ class tareaTarget(QFrame):
         QFrame{
         background-color: rgba(255,255,255,40);
         border: 1px solid rgba(255,255,255,80);
+        border-radius: 14px;
         
          }
          
@@ -53,6 +54,7 @@ class tareaTarget(QFrame):
         self.deleteButton.setFixedHeight(28)
         self.deleteButton.enterEvent = lambda e: self.deleteButton.setIcon(self.iconHover)
         self.deleteButton.leaveEvent = lambda e: self.deleteButton.setIcon(self.iconNormal)
+
         self.deleteButton.setStyleSheet('''
         QPushButton {
         background-color: transparent;
@@ -93,6 +95,7 @@ class tareaTarget(QFrame):
             background-color: transparent;
             border: 1px solid rgba(255,255,255,120);
             border-color: green;
+            border-radius: 14px;
             }
             ''')
         else:
@@ -106,11 +109,13 @@ class tareaTarget(QFrame):
                     QFrame{
                     background-color: rgba(255,255,255,40);
                     border: 1px solid rgba(255,255,255,80);
+                    border-radius: 14px;
 
                      }
 
                      QFrame::hover {
                      background-color: rgba(255,255,255,60);
+                     border-radius: 14px;
                      }
                     ''')
     def eliminarTarea(self):

@@ -1,13 +1,14 @@
 from PySide6.QtCore import Qt, QSize, QUrl
-from PySide6.QtGui import QAction, QIcon, QPixmap
+from PySide6.QtGui import QAction, QIcon, QPixmap, QColor
 from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QHBoxLayout, QLabel, QScrollArea, QPushButton, QMenu, \
-    QSizePolicy, QComboBox, QDialog
+    QSizePolicy, QComboBox, QDialog, QGraphicsDropShadowEffect
 from IU.estilosProject import *
 from IU.Ventanas.Widgets.BarProgressCircle import WidgetCirculo
 from IU.Ventanas.Widgets.targetaTarea import tareaTarget
 from IU.Ventanas.Widgets.dialogoTarea import dialogoNuevaTarea
 from IU.Ventanas.Widgets.dialogNewSetTime import dialogNewTime
 from IU.Ventanas.Widgets.structureTime import ContadorPostura
+from PySide6.QtSvgWidgets import QSvgWidget
 
 from IU.GUI.visionWorker1 import VisionWorker
 from IU.GUI import visonAdapter
@@ -50,12 +51,21 @@ class WidDashboard(QWidget):
         frame_status = QFrame()
 
         layoutSuperior = QHBoxLayout(frame_status)
-        layoutSuperior.setContentsMargins(9, 15, 5, 15)
-        layoutSuperior.setSpacing(10)
+        layoutSuperior.setContentsMargins(9, 15, 20, 15)
+        #layoutSuperior.setSpacing(10)
 
         frameDetect = QFrame(objectName = "frameInterno")
         layoutDetect = QVBoxLayout(frameDetect)
-        layoutDetect.setContentsMargins(12, 15, 25, 10)
+        layoutDetect.setContentsMargins(12, 15, 18, 10)
+
+
+
+        shadow = QGraphicsDropShadowEffect()
+        shadow.setBlurRadius(30)  # Qué tan difuminada
+        shadow.setOffset(0, 6)  # x, y
+        shadow.setColor(QColor(0, 0, 0, 120))
+        frameDetect.setGraphicsEffect(shadow)
+        frameDetect.graphicsEffect()
 
         self.estatusTxt = QLabel()
         self.estatusTxt.setText("Esperando...")
@@ -77,21 +87,38 @@ class WidDashboard(QWidget):
         frameTiempo1=QFrame()
         frameTiempo1.setStyleSheet('''
         QFrame{
-        background-color: rgba(255,255,255,40);
-        border: 1px solid rgba(255,255,255,80);
+        background-color: #172928;
+        border: 1px solid #1e5649;
         border-radius:20px;
          }
         ''')
+        shadow2 = QGraphicsDropShadowEffect()
+        shadow2.setBlurRadius(30)  # Qué tan difuminada
+        shadow2.setOffset(0, 6)  # x, y
+        shadow2.setColor(QColor(0, 50, 0, 120))
+
+        frameTiempo1.setGraphicsEffect(shadow2)
+        frameTiempo1.graphicsEffect()
+
         layoutFrame1 = QVBoxLayout(frameTiempo1)
 
         frameTiempo2 =QFrame()
         frameTiempo2.setStyleSheet('''
         QFrame{
-        background-color: #8d0809;
-        border: 1px solid rgba(255,255,255,80);
+        background-color: #292021;
+        border: 1px solid #61332e;
         border-radius:20px;
         }
         ''')
+
+        shadow3 = QGraphicsDropShadowEffect()
+        shadow3.setBlurRadius(30)  # Qué tan difuminada
+        shadow3.setOffset(0, 6)  # x, y
+        shadow3.setColor(QColor(50, 0, 0, 120))
+
+        frameTiempo2.setGraphicsEffect(shadow3)
+        frameTiempo2.graphicsEffect()
+
         layoutFrame2 = QVBoxLayout(frameTiempo2)
 
         linea = QFrame()
@@ -100,7 +127,7 @@ class WidDashboard(QWidget):
         linea.setFixedHeight(1)
         linea.setStyleSheet("""
         QFrame{
-            background-color: #b4b4b4;
+            background-color: #1e5649;
             border-color: transparent;
         }
         """)
@@ -111,7 +138,7 @@ class WidDashboard(QWidget):
         linea2.setFixedHeight(1)
         linea2.setStyleSheet("""
          QFrame{
-             background-color: #b4b4b4;
+             background-color: #61332e;
              border-color: transparent;
          }
          """)
@@ -122,15 +149,26 @@ class WidDashboard(QWidget):
         linea3.setFixedWidth(1)
         linea3.setStyleSheet("""
                  QFrame{
-                     background-color: #b4b4b4;
+                     background-color: #dd9a3a;
                      border-color: transparent;
                  }
                  """)
+        widgetTiempo1 = QWidget()
+        layoutIconString1 = QHBoxLayout(widgetTiempo1)
+        layoutIconString1.setContentsMargins(5, 0, 0, 5)
+        layoutIconString1.setSpacing(6)
+
+
+        icon1 = QSvgWidget("pictures/posturaBuena.svg")
+        icon1.setFixedSize(22,22)
 
         postureGoodTxt1 = QLabel()
         postureGoodTxt1.setText("Buena Postura")
         postureGoodTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureGoodTxt1.setStyleSheet(contador1)
+        postureGoodTxt1.setStyleSheet(labelGood)
+
+        layoutIconString1.addWidget(icon1)
+        layoutIconString1.addWidget(postureGoodTxt1)
 
 
         self.postureGoodTxt2 = QLabel()
@@ -139,22 +177,34 @@ class WidDashboard(QWidget):
         self.postureGoodTxt2.setStyleSheet(contador1)
 
 
-        layoutFrame1.addWidget(postureGoodTxt1)
+        layoutFrame1.addWidget(widgetTiempo1)
         layoutFrame1.addWidget(linea)
         layoutFrame1.addWidget(self.postureGoodTxt2)
 
 
+        widgetTiempo2 = QWidget()
+        layoutIconString2 = QHBoxLayout(widgetTiempo2)
+        layoutIconString2.setContentsMargins(5, 0, 0, 5)
+        layoutIconString2.setSpacing(6)
+
+
+        icon2 = QSvgWidget("pictures/posturaMala.svg")
+        icon2.setFixedSize(22,22)
+
         postureBadTxt1 = QLabel()
         postureBadTxt1.setText("Mala Postura")
         postureBadTxt1.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        postureBadTxt1.setStyleSheet(contador2)
+        postureBadTxt1.setStyleSheet(labelBad)
+
+        layoutIconString2.addWidget(icon2)
+        layoutIconString2.addWidget(postureBadTxt1)
 
         self.postureBadTxt2 = QLabel()
         self.postureBadTxt2.setText("0:00")
         self.postureBadTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.postureBadTxt2.setStyleSheet(contador2)
 
-        layoutFrame2.addWidget(postureBadTxt1)
+        layoutFrame2.addWidget(widgetTiempo2)
         layoutFrame2.addWidget(linea2)
         layoutFrame2.addWidget(self.postureBadTxt2)
 
@@ -167,14 +217,23 @@ class WidDashboard(QWidget):
         frameRacha.setStyleSheet('''
                 QFrame{
                 background-color: #black;
-                border: 1px solid rgba(255,255,255,80);
-                border-radius:20px;
+                border: None;
+                border-radius:16px;
                 }
                 ''')
+        shadowR = QGraphicsDropShadowEffect()
+        shadowR.setBlurRadius(30)  # Qué tan difuminada
+        shadowR.setOffset(0, 6)  # x, y
+        shadowR.setColor(QColor(0, 0, 0, 120))
+        frameRacha.setGraphicsEffect(shadowR)
+        frameRacha.graphicsEffect()
+
+        icon3 = QSvgWidget("pictures/rachaIcon.svg")
+        icon3.setFixedSize(22, 22)
 
         rachaTxt = QLabel()
         rachaTxt.setText("Racha")
-        rachaTxt.setStyleSheet(contador1)
+        rachaTxt.setStyleSheet(labelRacha)
         rachaTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         #rachaTxt.setFixedWidth(300)
 
@@ -184,9 +243,13 @@ class WidDashboard(QWidget):
         self.rachaTxt2.setStyleSheet(contador1)
         self.rachaTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        layoutRachaa.addWidget(rachaTxt)
+        layoutRachaa.addSpacing(10)
+        layoutRachaa.addWidget(icon3)
+
+        layoutRachaa.addWidget(rachaTxt, stretch=1)
         layoutRachaa.addWidget(linea3)
-        layoutRachaa.addWidget(self.rachaTxt2)
+        layoutRachaa.addStretch()
+        layoutRachaa.addWidget(self.rachaTxt2, stretch=3)
 
 
         timeSeccionTxt = QLabel()
@@ -212,8 +275,8 @@ class WidDashboard(QWidget):
         layoutDetect.addSpacing(4)
         layoutDetect.addWidget(frameRacha)
         layoutDetect.addStretch()
-        layoutDetect.addWidget(timeSeccionTxt)
-        layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
+        #layoutDetect.addWidget(timeSeccionTxt)
+        #layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
 
 
 
@@ -221,9 +284,21 @@ class WidDashboard(QWidget):
         frameVision.setStyleSheet("""
         QFrame{
         border-color: transparent;
+        border-radius: 120px;
         }
         """)
         visionLayout = QVBoxLayout(frameVision)
+        visionLayout.setContentsMargins(0, 0, 0, 0)
+
+        shadowS = QGraphicsDropShadowEffect()
+        shadowS.setBlurRadius(35)  # Qué tan difuminada
+        shadowS.setOffset(0, 8)  # x, y
+        shadowS.setColor(QColor(0,0, 0, 140))
+
+        frameVision.setGraphicsEffect(shadowS)
+        frameVision.graphicsEffect()
+
+
 
         #visonAdapter.iniciar_vision()
 
@@ -249,8 +324,9 @@ class WidDashboard(QWidget):
 
 
 
-        layoutSuperior.addWidget(frameDetect, stretch=4)
-        layoutSuperior.addWidget(frameVision, stretch=5)
+        layoutSuperior.addWidget(frameDetect, stretch=5)
+        layoutSuperior.addSpacing(15)
+        layoutSuperior.addWidget(frameVision, stretch=6)
 
         # Fila inferior: Frame 3 + Frame 4 lado a lado
         bottom_widget = QWidget()
@@ -276,6 +352,7 @@ class WidDashboard(QWidget):
         self.scrollTareas = QScrollArea()
         self.contenidoScroll = QWidget()
         self.contenidoLayout = QVBoxLayout(self.contenidoScroll)
+
         self.contenidoLayout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.scrollTareas.setStyleSheet('''
         QScrollArea {
@@ -325,19 +402,21 @@ QScrollArea > QWidget > QWidget {
 
         botonTareaWidget = QWidget()
         layoutBotones = QHBoxLayout(botonTareaWidget)
+        layoutBotones.addSpacing(22)
+        layoutBotones.setContentsMargins(15, 5, 19, 5)
 
         self.buttonAgregar = QPushButton("Agregar")
         self.buttonAgregar.setStyleSheet('''
         QPushButton{
-        background-color: #00897b;
+        background-color: #23614a;
         font-size: 15px;
         font-weight: bold;
         }
         QPushButton:hover {
-        background-color: #3a998f;
+        background-color: #3a8066;
         }
         QPushButton:pressed {
-        background-color: #00897b;
+        background-color: #3d9e7a;
         }
         ''')
         self.buttonMarcar = QPushButton("Eliminar Completadas")
@@ -381,6 +460,13 @@ QScrollArea > QWidget > QWidget {
         self.estatatusModo.setText("Trabajando")
         self.estatatusModo.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.estatatusModo.setStyleSheet(modo1)
+
+        shadowL2 = QGraphicsDropShadowEffect()
+        shadowL2.setBlurRadius(30)  # Qué tan difuminada
+        shadowL2.setOffset(0, 6)  # x, y
+        shadowL2.setColor(QColor(0, 0, 0, 120))
+        self.estatatusModo.setGraphicsEffect(shadowL2)
+        self.estatatusModo.graphicsEffect()
 
         self.timerPausado = True
         self.modoTrabajo= True
@@ -438,6 +524,14 @@ QScrollArea > QWidget > QWidget {
         self.modoTxt.setText("Modo")
         self.modoTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.modoTxt.setStyleSheet(modo1)
+
+
+        shadowL1 = QGraphicsDropShadowEffect()
+        shadowL1.setBlurRadius(30)  # Qué tan difuminada
+        shadowL1.setOffset(0, 6)  # x, y
+        shadowL1.setColor(QColor(0, 0, 0, 120))
+        self.modoTxt.setGraphicsEffect(shadowL1)
+        self.modoTxt.graphicsEffect()
 
 
         self.selecMenu = QMenu(self)

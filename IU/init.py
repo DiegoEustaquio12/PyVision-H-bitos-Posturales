@@ -18,7 +18,7 @@ class PyVisionWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(" ")
         self.setWindowIcon(QIcon("pictures/logoLab.svg"))
-        self.setMinimumSize(1100, 700)
+        self.setMinimumSize(1170, 720)
         self.setStyleSheet(estilo1)
 
         # Widget central
@@ -42,7 +42,7 @@ class PyVisionWindow(QMainWindow):
 
         self.logo = QLabel()
         self.logo.setStyleSheet(imagenes)
-        self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(100, 100,
+        self.logo.setPixmap(QPixmap("pictures/logo3.png").scaled(100, 100,
                                                                 Qt.AspectRatioMode.KeepAspectRatio,
                                                                 Qt.TransformationMode.SmoothTransformation))
         self.logo.setFixedHeight(60)
@@ -132,11 +132,11 @@ class PyVisionWindow(QMainWindow):
         ancho_inicio = 210 if expandido else 60
         ancho_fin = 60 if expandido else 210
         if ancho_inicio > 60 :
-            self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(100, 100,
+            self.logo.setPixmap(QPixmap("pictures/logo3.png").scaled(100, 100,
                                                                     Qt.AspectRatioMode.KeepAspectRatio,
                                                                     Qt.TransformationMode.SmoothTransformation))
         else:
-            self.logo.setPixmap(QPixmap("pictures/logo.png").scaled(150, 150,
+            self.logo.setPixmap(QPixmap("pictures/logo3.png").scaled(150, 150,
                                                                     Qt.AspectRatioMode.KeepAspectRatio,
                                                                     Qt.TransformationMode.SmoothTransformation))
 

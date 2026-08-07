@@ -2,19 +2,19 @@ from PySide6.QtGui import QImage
 
 estilo1 = '''
     #main {
-    background: transparent;
+    background: #14181C;
     }
 
     QFrame {
     
-    background-color: #2B2D31;
+    background-color: #26282E;
     border: 1.4px solid #3A3D41;
     border-radius: 16px;
 
     }    
     
     #Sidebar {
-    background-color: #202123;
+    background-color: #17181C;
     }
     
     #pila {
@@ -25,7 +25,7 @@ estilo1 = '''
     }
     
     #frameInterno {
-    background-color: #393a41;
+    background-color: #2E3138;
     border-radius: 35px;
     }    
     
@@ -110,6 +110,21 @@ QLabel {
 color: white;            
                 }
 '''
+labelGood = contadores + '''
+QLabel {
+color: #22b196;            
+                }
+'''
+labelBad = contadores + '''
+QLabel {
+color: #c54b3a;            
+                }
+'''
+labelRacha = contadores + '''
+QLabel {
+color: #dd9a3a;            
+                }
+'''
 
 contador2 = contadores + '''
 QLabel {
@@ -189,8 +204,95 @@ dialogo = '''
         }
 
         QLineEdit:focus{
+            border:2px solid #2EA043;
+        }
+
+        QPushButton{
+            background:#2EA043;
+            color:white;
+            border:none;
+            border-radius:12px;
+            padding:12px;
+            font-size:15px;
+            font-weight:bold;
+        }
+
+        QPushButton:hover{
+            background:#2CD565;
+        }
+
+        QPushButton:pressed{
+            background:#169C46;
+        }
+
+
+'''
+
+dialogSetTiempo = '''
+QDialog{
+            background:#202124;
+        }
+        
+        QFrame{
+        background: transparent;
+        border: none;
+        }
+
+        QLabel#title{
+            color:white;
+            font-size:24px;
+            font-weight:700;
+        }
+
+        QLabel#subtitle{
+            color:#B8B8B8;
+            font-size:18px;
+            font-weight:700;
+        }
+
+        QLabel{
+            color:white;
+            font-size:15px;
+            font-weight:600;
+        }
+
+        QLineEdit{
+            background:#2B2D31;
+            border:2px solid #3A3D42;
+            border-radius:12px;
+            padding:10px;
+            color:white;
+            font-size:15px;
+        }
+
+        QLineEdit:focus{
             border:2px solid #4F8EF7;
         }
+
+        QSpinBox{
+            background:#2B2D31;
+            border:2px solid #3A3D42;
+            border-radius:12px;
+
+            color:white;
+            font-size:26px;
+            font-weight:bold;
+
+            min-width:120px;
+            min-height:45px;
+        }
+
+        QSpinBox:focus{
+            border:2px solid #4F8EF7;
+        }
+
+        QSpinBox::up-button,
+        QSpinBox::down-button{
+            width:25px;
+            height:30px;
+            }
+        
+
 
         QPushButton{
             background:#4F8EF7;
@@ -209,6 +311,4 @@ dialogo = '''
         QPushButton:pressed{
             background:#2F6FE5;
         }
-
-
 '''

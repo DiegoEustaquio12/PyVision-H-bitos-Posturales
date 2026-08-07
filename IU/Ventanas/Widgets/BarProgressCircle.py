@@ -93,7 +93,7 @@ class WidgetCirculo(QWidget):
 
         colorBackground = self.get_background_color(fraction)
         # Fondo
-        pen_bg = QPen(colorBackground)
+        pen_bg = QPen("#2c333a")
         pen_bg.setWidth(self.bar_width)
         pen_bg.setCapStyle(Qt.RoundCap)
         painter.setPen(pen_bg)
