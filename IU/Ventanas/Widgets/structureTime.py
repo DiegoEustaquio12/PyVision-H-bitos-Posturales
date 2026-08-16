@@ -46,5 +46,5 @@ class ContadorPostura:
         self.tiempo_correcta = 0.0
         self.tiempo_incorrecta = 0.0
         self.racha_actual = 0.0
-        self.racha_maxima = 0.0
+        #self.racha_maxima = 0.0
         self._ultimo_tiemestamp = None

@@ -9,12 +9,15 @@ estilo1 = '''
     
     background-color: #26282E;
     border: 1.4px solid #3A3D41;
-    border-radius: 16px;
+    border-radius: 15px;
 
     }    
     
     #Sidebar {
     background-color: #17181C;
+    border: 1px solid #171812;
+    border-radius: 15px;
+    
     }
     
     #pila {
@@ -126,6 +129,12 @@ color: #dd9a3a;
                 }
 '''
 
+labelRecord = contadores + '''
+    QLabel {
+    color: #fdd502;            
+    }
+'''
+
 contador2 = contadores + '''
 QLabel {
 color: white;            
@@ -174,58 +183,57 @@ QScrollBar::sub-page:vertical {
 '''
 
 dialogo = '''
-         QDialog{
-            background:#202124;
-        }
-        QFrame{
-        background: transparent;
-        border: none;
-        }
+QDialog{
+    background:#202124;
+}
 
-        QLabel#titulo{
-            color:white;
-            font-size:22px;
-            font-weight:700;
-        }
+QFrame{
+    background: transparent;
+    border: none;
+}
 
-        QLabel{
-            color:white;
-            font-size:14px;
-            font-weight:700;
-        }
+QLabel#titulo{
+    color:white;
+    font-size:22px;
+    font-weight:700;
+}
 
-        QLineEdit{
-            background:#2B2D31;
-            border:2px solid #3A3D42;
-            border-radius:12px;
-            padding:10px;
-            color:white;
-            font-size:15px;
-        }
+QLabel{
+    color:white;
+    font-size:15px;
+    font-weight:600;
+}
 
-        QLineEdit:focus{
-            border:2px solid #2EA043;
-        }
+QLineEdit{
+    background:#2B2D31;
+    border:2px solid #3A3D42;
+    border-radius:12px;
+    padding:10px;
+    color:white;
+    font-size:15px;
+}
 
-        QPushButton{
-            background:#2EA043;
-            color:white;
-            border:none;
-            border-radius:12px;
-            padding:12px;
-            font-size:15px;
-            font-weight:bold;
-        }
+QLineEdit:focus{
+    border:2px solid #4F8EF7;
+}
 
-        QPushButton:hover{
-            background:#2CD565;
-        }
+QPushButton{
+    background:#4F8EF7;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:12px;
+    font-size:15px;
+    font-weight:bold;
+}
 
-        QPushButton:pressed{
-            background:#169C46;
-        }
+QPushButton:hover{
+    background:#6AA5FF;
+}
 
-
+QPushButton:pressed{
+    background:#2F6FE5;
+}
 '''
 
 dialogSetTiempo = '''

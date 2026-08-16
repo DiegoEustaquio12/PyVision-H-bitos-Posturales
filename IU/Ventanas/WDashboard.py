@@ -153,6 +153,16 @@ class WidDashboard(QWidget):
                      border-color: transparent;
                  }
                  """)
+        linea4 = QFrame()
+        linea4.setFrameShape(QFrame.Shape.VLine)
+        linea4.setFrameShadow(QFrame.Shadow.Sunken)
+        linea4.setFixedWidth(1)
+        linea4.setStyleSheet("""
+                         QFrame{
+                             background-color: #fdd502;
+                             border-color: transparent;
+                         }
+                         """)
         widgetTiempo1 = QWidget()
         layoutIconString1 = QHBoxLayout(widgetTiempo1)
         layoutIconString1.setContentsMargins(5, 0, 0, 5)
@@ -251,20 +261,46 @@ class WidDashboard(QWidget):
         layoutRachaa.addStretch()
         layoutRachaa.addWidget(self.rachaTxt2, stretch=3)
 
+        frameRecord = QFrame()
+        layoutRecord = QHBoxLayout(frameRecord)
 
-        timeSeccionTxt = QLabel()
-        timeSeccionTxt.setText("Primera fase")
-        timeSeccionTxt.setAlignment(Qt.AlignmentFlag.AlignLeft.AlignVCenter)
-        timeSeccionTxt.setStyleSheet(contador3)
+        frameRecord.setStyleSheet('''
+                        QFrame{
+                        background-color: #black;
+                        border: None;
+                        border-radius:16px;
+                        }
+                        ''')
+        shadowRec = QGraphicsDropShadowEffect()
+        shadowRec.setBlurRadius(30)  # Qué tan difuminada
+        shadowRec.setOffset(0, 6)  # x, y
+        shadowRec.setColor(QColor(0, 0, 0, 120))
+        frameRecord.setGraphicsEffect(shadowRec)
+        frameRecord.graphicsEffect()
 
-        self.visionButton = QPushButton()
-        self.visionButton.setText("Vision")
-        self.visionButton.setIcon(QIcon("pictures/play.svg"))
-        self.visionButton.setCheckable(True)
-        self.visionButton.toggled.connect(self.toggle_button_camara)
+        icon4 = QSvgWidget("pictures/trophy.svg")
+        icon4.setFixedSize(22, 22)
 
+        recordTxt = QLabel()
+        recordTxt.setText("Tiempo mas alto")
+        recordTxt.setStyleSheet(labelRecord)
+        recordTxt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # rachaTxt.setFixedWidth(300)
 
+        self.recordTxt2 = QLabel()
+        self.recordTxt2.setText("0:00")
+        self.recordTxt2.setStyleSheet(contador1)
+        self.recordTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        layoutRecord.addSpacing(10)
+        layoutRecord.addWidget(icon4)
+        layoutRecord.addSpacing(14)
+        layoutRecord.addWidget(recordTxt, stretch=1)
+        layoutRecord.addSpacing(10)
+        layoutRecord.addWidget(linea4)
+        layoutRecord.addSpacing(20)
+        layoutRecord.addWidget(self.recordTxt2, stretch=3)
+        layoutRecord.addSpacing(20)
 
 
 
@@ -274,6 +310,9 @@ class WidDashboard(QWidget):
         layoutDetect.addWidget(widgetTiempos)
         layoutDetect.addSpacing(4)
         layoutDetect.addWidget(frameRacha)
+        layoutDetect.addSpacing(9)
+        layoutDetect.addWidget(frameRecord, alignment= Qt.AlignmentFlag.AlignLeft)
+        #layoutDetect.addSpacing(10)
         layoutDetect.addStretch()
         #layoutDetect.addWidget(timeSeccionTxt)
         #layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
@@ -570,6 +609,9 @@ QScrollArea > QWidget > QWidget {
         buttonMode.setMenu(self.selecMenu)
         buttonMode.show()
 
+        self.ShowTimeWork = QFrame(self)
+
+
 
 
         layoutSelect.addWidget(self.modoTxt, stretch= 4)
@@ -794,6 +836,7 @@ QScrollArea > QWidget > QWidget {
         self.postureGoodTxt2.setText(self.formaterTime(resumen["tiempo_correcta"]))
         self.postureBadTxt2.setText(self.formaterTime(resumen["tiempo_incorrecta"]))
         self.rachaTxt2.setText(self.formaterTime(resumen["racha_actual"]))
+        self.recordTxt2.setText(self.formaterTime(resumen["racha_maxima"]))
 
 
 
@@ -838,6 +881,10 @@ QScrollArea > QWidget > QWidget {
         elif not debePrender and self.vision_worker is not None:
             self.desactivar_camara()
             print("Vision Desactivada")
+
+    def retornarTareas(self):
+        pass
+
 
 
 

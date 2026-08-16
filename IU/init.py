@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget,
-    QHBoxLayout, QVBoxLayout, QFrame, QLabel, QPushButton, QStackedWidget)
-from PySide6.QtGui import (QPixmap, QIcon)
+    QHBoxLayout, QVBoxLayout, QFrame, QLabel, QPushButton, QStackedWidget, QGraphicsDropShadowEffect)
+from PySide6.QtGui import (QPixmap, QIcon, QColor)
 from PySide6.QtCore import Qt, QSize, QPropertyAnimation, QEasingCurve
 import sys
 from estilosProject import *
@@ -79,7 +79,8 @@ class PyVisionWindow(QMainWindow):
         self.sidebarLayout.addWidget(buttonToggle, alignment= Qt.AlignmentFlag.AlignRight)
         self.sidebarLayout.addSpacing(10)
         self.sidebarLayout.addWidget(buttonDash)
-        self.sidebarLayout.addSpacing(60)
+        #self.sidebarLayout.addSpacing(60)
+        self.sidebarLayout.addSpacing(10)
         self.sidebarLayout.addWidget(buttonEstadisticas)
         #self.sidebarLayout.addSpacing(10)
         #self.sidebarLayout.addWidget(buttonObjetivos)
