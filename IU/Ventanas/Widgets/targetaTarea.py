@@ -7,9 +7,15 @@ class tareaTarget(QFrame):
 
     estadoCambiado = Signal(object, bool)
     solicitudEliminar = Signal(object)
+    contador_id = 0
 
-    def __init__(self, texto="No Asignada"):
+    def __init__(self, texto="No Asignada", id_tarea=None):
         super().__init__()
+
+        if id_tarea is None:
+            tareaTarget.contador_id += 1
+            id_tarea = tareaTarget.contador_id
+        self.id_tarea = id_tarea
 
         self.completada = False
 

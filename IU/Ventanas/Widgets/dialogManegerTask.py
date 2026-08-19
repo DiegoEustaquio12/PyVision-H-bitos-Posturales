@@ -10,18 +10,19 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QGridLayout,
     QMessageBox,
-    QAbstractSpinBox, QScrollArea, QWidget
+    QAbstractSpinBox, QScrollArea, QWidget, QCheckBox
 )
 import sys
 from PySide6.QtWidgets import QApplication
 from IU.estilosProject import dialogSetTiempo
-from IU.Ventanas.WDashboard import WidDashboard
 
 class dialogSelectTask(QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, tareas_pendientes: list[tuple[int, str]],  parent=None):
         super().__init__(parent)
 
+        self.checkboxs = {}
+        self.sinAsignaciones = False #Bandera para distinguir el caso
 
 
         self.setFixedSize(600, 500)
@@ -50,7 +51,12 @@ class dialogSelectTask(QDialog):
                 ''')
 
 
-        self.contenidoDashboard = WidDashboard()
+
+
+        for id_tarea, texto in tareas_pendientes:
+            check = QCheckBox(texto)
+            self.checkboxs[id_tarea] = check
+            self.contenidoLayout.addWidget(check)
 
 
 
@@ -61,6 +67,7 @@ class dialogSelectTask(QDialog):
         botonesWidget = QWidget()
         layoutbotones = QVBoxLayout(botonesWidget)
         self.buttonAceptar = QPushButton("Aceptar")
+        self.buttonAceptar.clicked.connect(self.on_aceptar)
         self.buttonAceptar.setStyleSheet('''
                 QPushButton{
                 background-color: #23614a;
@@ -75,6 +82,7 @@ class dialogSelectTask(QDialog):
                 }
                 ''')
         self.buttonNinguna = QPushButton("Continuar sin Asignaciones")
+        self.buttonNinguna.clicked.connect(self.on_sinAsignacion)
         self.buttonNinguna.setStyleSheet('''
                 QPushButton{
                 background-color: #9b9696;
@@ -92,12 +100,21 @@ class dialogSelectTask(QDialog):
         layoutbotones.addWidget(self.buttonAceptar, stretch=2)
         layoutbotones.addWidget(self.buttonNinguna, stretch=2)
 
-
-
         layout.addWidget(tittle)
         layout.addWidget(self.scrollSeleccion)
         layout.addWidget(botonesWidget)
 
+    def tareas_seleccionadas(self) -> list[int]:
+        return [id_tarea for id_tarea, check in self.checkboxs.items() if check.isChecked()]
+
+    def on_aceptar(self):
+        if not self.tareas_seleccionadas():
+            return
+        self.accept()
+
+    def on_sinAsignacion(self):
+        self.sinAsignaciones = True
+        self.accept()
 
 
 
@@ -109,6 +126,6 @@ class dialogSelectTask(QDialog):
 
 
 
-app = QApplication(sys.argv)
-dialogo = dialogSelectTask()
-dialogo.exec()
+#app = QApplication(sys.argv)
+#dialogo = dialogSelectTask()
+#dialogo.exec()

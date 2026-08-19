@@ -9,6 +9,7 @@ from IU.Ventanas.Widgets.dialogoTarea import dialogoNuevaTarea
 from IU.Ventanas.Widgets.dialogNewSetTime import dialogNewTime
 from IU.Ventanas.Widgets.structureTime import ContadorPostura
 from PySide6.QtSvgWidgets import QSvgWidget
+from IU.Ventanas.Widgets.dialogManegerTask import dialogSelectTask
 
 from IU.GUI.visionWorker1 import VisionWorker
 from IU.GUI import visonAdapter
@@ -16,12 +17,24 @@ import time
 
 import os
 from PySide6.QtMultimedia import QSoundEffect
+from enum import Enum, auto
 
+
+
+class EstadoApp(Enum):
+    INACTIVO = auto()
+    LIBRE = auto()
+    EN_SESION = auto()
 
 
 class WidDashboard(QWidget):
     def __init__(self):
         super().__init__()
+
+        self._estado_app = EstadoApp.INACTIVO
+        self._sesion_pendientes = set()
+
+
         self.ciclosTerminados = 0
 
         self._sonido_alerta = QSoundEffect()
@@ -292,6 +305,10 @@ class WidDashboard(QWidget):
         self.recordTxt2.setStyleSheet(contador1)
         self.recordTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.botonPrueba = QPushButton("Iniciar dialogo")
+        self.botonPrueba.clicked.connect(self.on_start_clicked)
+
+
         layoutRecord.addSpacing(10)
         layoutRecord.addWidget(icon4)
         layoutRecord.addSpacing(14)
@@ -314,6 +331,7 @@ class WidDashboard(QWidget):
         layoutDetect.addWidget(frameRecord, alignment= Qt.AlignmentFlag.AlignLeft)
         #layoutDetect.addSpacing(10)
         layoutDetect.addStretch()
+        layoutDetect.addWidget(self.botonPrueba)
         #layoutDetect.addWidget(timeSeccionTxt)
         #layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
 
@@ -631,6 +649,8 @@ QScrollArea > QWidget > QWidget {
         right_layout.addWidget(frame_status, stretch=50)
         right_layout.addWidget(bottom_widget, stretch=50)
 
+        self._cambiar_estado(EstadoApp.INACTIVO)
+
 
     def txtPomodoro(self):
         self.progressTime.set_tiempos(30,15)
@@ -719,8 +739,26 @@ QScrollArea > QWidget > QWidget {
             for i in self.listaSets:
                 print(i)
 
+    def _cambiar_estado(self, nuevo_estado: EstadoApp):
+        self._estado_app = nuevo_estado
+        print(f"Estado cambiado a: {nuevo_estado}")
+
+        self.buttonStart.setEnabled(nuevo_estado != EstadoApp.INACTIVO)
+        self.buttonRefresh.setEnabled(nuevo_estado != EstadoApp.INACTIVO)
+        self.botonPrueba.setEnabled(nuevo_estado != EstadoApp.EN_SESION)
+
     def cambioCheckout(self, targeta, completado):
         print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
+
+        if completado and targeta.id_tarea in getattr(self, '_sesion_pendientes', set()):
+            self._sesion_pendientes.discard(targeta.id_tarea)
+            if not self._sesion_pendientes:
+                self._on_sesion_completado()
+
+    def _on_sesion_completado(self):
+        print("sesion completa, terminar monitoreo")
+
+
 
     def accionAgregarTarea(self):
         dialogNewTarea = dialogoNuevaTarea(self)
@@ -882,8 +920,52 @@ QScrollArea > QWidget > QWidget {
             self.desactivar_camara()
             print("Vision Desactivada")
 
-    def retornarTareas(self):
-        pass
+    def obtener_tareas_pendientes(self) -> list[tuple[int, str]]:
+        return [(t.id_tarea, t.trabajoLabel.text()) for t in self.listaTareas if not t.completada]
+
+    # en Dashboard
+    def iniciar_sesion(self, ids_seleccionados: list[int]):
+        self._sesion_pendientes = set(ids_seleccionados)
+
+        for tarjeta in self.listaTareas:
+            if tarjeta.id_tarea in self._sesion_pendientes:
+                tarjeta.setProperty("en_sesion", True)
+                tarjeta.style().unpolish(tarjeta)
+                tarjeta.style().polish(tarjeta)
+
+
+    def on_start_clicked(self):
+        pendientes = self.obtener_tareas_pendientes()
+        dialogo = dialogSelectTask(pendientes, parent=self)
+        if dialogo.exec_() != QDialog.Accepted:
+            print("seccion cancelada")
+            return
+
+        if dialogo.sinAsignaciones:
+            ids_seleccionados = []
+            print("continuar sin asignaciones")
+        else:
+            ids_seleccionados = dialogo.tareas_seleccionadas()
+            print(f"inicio de seccion{ids_seleccionados}")
+
+        if self._estado_app == EstadoApp.INACTIVO:
+            #self.activar_vision()
+            print("se prende vision")
+            if ids_seleccionados:
+                self.iniciar_sesion(ids_seleccionados)
+                self._cambiar_estado(EstadoApp.EN_SESION)
+            else:
+                self._cambiar_estado(EstadoApp.LIBRE)
+
+        elif self._estado_app == EstadoApp.LIBRE:
+            if ids_seleccionados:
+                self.iniciar_sesion(ids_seleccionados)
+                self._cambiar_estado(EstadoApp.EN_SESION)
+                #por si elige "sin asignaciones" estando ya libre no hay cambio
+
+        self.iniciar_sesion(ids_seleccionados)
+
+
 
 
 
