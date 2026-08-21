@@ -421,6 +421,14 @@ QScrollArea > QWidget > QWidget {
     background: #1f1f1f;
     border-radius: 15px;
 }
+
+    QScrollBar:vertical {
+        width: 0px;
+    }
+
+    QScrollBar:horizontal {
+        height: 0px;
+    }
         ''')
 
         self.listaTareas = []
@@ -750,13 +758,11 @@ QScrollArea > QWidget > QWidget {
     def cambioCheckout(self, targeta, completado):
         print(f"Tarea : {targeta.trabajoLabel.text()}, Completada : {completado}")
 
-        if completado and targeta.id_tarea in getattr(self, '_sesion_pendientes', set()):
+        if completado and targeta.id_tarea in self._sesion_pendientes:
             self._sesion_pendientes.discard(targeta.id_tarea)
-            if not self._sesion_pendientes:
+            if not self._sesion_pendientes and self._estado_app == EstadoApp.EN_SESION:
                 self._on_sesion_completado()
 
-    def _on_sesion_completado(self):
-        print("sesion completa, terminar monitoreo")
 
 
 
@@ -773,6 +779,12 @@ QScrollArea > QWidget > QWidget {
     def eleminarFrameTarea(self, targeta):
         self.contenidoLayout.removeWidget(targeta)
         self.listaTareas.remove(targeta)
+
+        if targeta.id_tarea in self._sesion_pendientes:
+            self._sesion_pendientes.discard(targeta.id_tarea)
+            if not self._sesion_pendientes and self._estado_app == EstadoApp.EN_SESION:
+                self._on_sesion_completado()
+
         targeta.deleteLater()
         print(targeta.trabajoLabel.text(), " ah sido elimidado")
 
@@ -780,13 +792,10 @@ QScrollArea > QWidget > QWidget {
 
         tareas_a_eliminar = [t for t in self.listaTareas if t.completada]
 
+
         if tareas_a_eliminar:
             for tarjeta in tareas_a_eliminar:
-                self.contenidoLayout.removeWidget(tarjeta)
-                self.listaTareas.remove(tarjeta)
-                tarjeta.deleteLater()
-            for tarjeta in tareas_a_eliminar:
-                print(tarjeta)
+                self.eleminarFrameTarea(tarjeta)
 
         else:
             print("Sin Tareas terminadas")
@@ -890,9 +899,6 @@ QScrollArea > QWidget > QWidget {
         else:
             self.desactivar_camara()
 
-    def closeEvent(self, event):
-        self.desactivar_camara()
-        event.accept()
 
 
     def mostrar_placeholder_camera(self):
@@ -923,15 +929,25 @@ QScrollArea > QWidget > QWidget {
     def obtener_tareas_pendientes(self) -> list[tuple[int, str]]:
         return [(t.id_tarea, t.trabajoLabel.text()) for t in self.listaTareas if not t.completada]
 
-    # en Dashboard
+
     def iniciar_sesion(self, ids_seleccionados: list[int]):
         self._sesion_pendientes = set(ids_seleccionados)
 
         for tarjeta in self.listaTareas:
             if tarjeta.id_tarea in self._sesion_pendientes:
-                tarjeta.setProperty("en_sesion", True)
-                tarjeta.style().unpolish(tarjeta)
-                tarjeta.style().polish(tarjeta)
+                tarjeta.marcar_en_sesion(True)
+
+    def _on_sesion_completado(self):
+        print("sesion completa, terminar monitoreo")
+        self.desactivar_camara()
+        self.accionBotonRefresh()
+
+
+        for tarjeta in self.listaTareas:
+            tarjeta.marcar_en_sesion(False)
+
+        self._sesion_pendientes.clear()
+        self._cambiar_estado(EstadoApp.INACTIVO)
 
 
     def on_start_clicked(self):
@@ -964,6 +980,8 @@ QScrollArea > QWidget > QWidget {
                 #por si elige "sin asignaciones" estando ya libre no hay cambio
 
         self.iniciar_sesion(ids_seleccionados)
+
+
 
 
 

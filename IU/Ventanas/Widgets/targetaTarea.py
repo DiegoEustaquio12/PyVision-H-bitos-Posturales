@@ -1,7 +1,13 @@
+from threading import activeCount
+
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QLabel, QCheckBox, QFrame, QPushButton, QSizePolicy
 from PySide6.QtGui import QIcon
-
+from IU.Ventanas.Widgets.Style.styles import (estilo_tarea_normal,
+    estilo_tarea_en_sesion,
+    estilo_tarea_completada,
+    estilo_label_normal,
+    estilo_label_completada)
 
 class tareaTarget(QFrame):
 
@@ -18,6 +24,7 @@ class tareaTarget(QFrame):
         self.id_tarea = id_tarea
 
         self.completada = False
+        self.en_sesion = False
 
         self.setStyleSheet('''
         QFrame{
@@ -27,7 +34,7 @@ class tareaTarget(QFrame):
         
          }
          
-         QFrame::hover {
+         QFrame:hover {
          background-color: rgba(255,255,255,60);
          }
         ''')
@@ -81,6 +88,10 @@ class tareaTarget(QFrame):
         self.checkTrabajo.stateChanged.connect(self._checkbox_cambiado)
         self.deleteButton.clicked.connect(self.eliminarTarea)
 
+    def marcar_en_sesion(self, activo: bool):
+        self.en_sesion = activo
+        self.actualizarEstilo()
+
     def _checkbox_cambiado(self, state):
         self.completada = bool(state)
         self.estadoCambiado.emit(self, self.completada)
@@ -88,42 +99,15 @@ class tareaTarget(QFrame):
 
     def actualizarEstilo(self):
         if self.completada:
-            self.trabajoLabel.setStyleSheet('''
-                    font-size:12px;
-                    border-color: transparent;
-                    font-weight:bold;
-                    background-color: transparent;
-                    color: rgba(255,255,255,120);
-                    text-decoration: line-through;
-                    ''')
-            self.setStyleSheet('''
-            QFrame{
-            background-color: transparent;
-            border: 1px solid rgba(255,255,255,120);
-            border-color: green;
-            border-radius: 14px;
-            }
-            ''')
+            self.trabajoLabel.setStyleSheet(estilo_label_completada())
+            self.setStyleSheet(estilo_tarea_completada())
+        elif self.en_sesion:
+            self.trabajoLabel.setStyleSheet(estilo_label_normal())
+            self.setStyleSheet(estilo_tarea_en_sesion())
         else:
-            self.trabajoLabel.setStyleSheet('''
-                    font-size:12px;
-                    border-color: transparent;
-                    font-weight:bold;
-                    background-color: transparent;
-                    ''')
-            self.setStyleSheet('''
-                    QFrame{
-                    background-color: rgba(255,255,255,40);
-                    border: 1px solid rgba(255,255,255,80);
-                    border-radius: 14px;
+            self.trabajoLabel.setStyleSheet(estilo_label_normal())
+            self.setStyleSheet(estilo_tarea_normal())
 
-                     }
-
-                     QFrame::hover {
-                     background-color: rgba(255,255,255,60);
-                     border-radius: 14px;
-                     }
-                    ''')
     def eliminarTarea(self):
         self.solicitudEliminar.emit(self)
 
