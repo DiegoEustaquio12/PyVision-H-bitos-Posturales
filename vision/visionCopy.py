@@ -291,6 +291,7 @@ def main():
     opciones_vision = vision.PoseLandmarkerOptions(
         base_options=python.BaseOptions(model_asset_buffer=model_data),
         running_mode=vision.RunningMode.IMAGE,
+        num_poses=4,
         min_pose_detection_confidence=0.5,
         min_pose_presence_confidence=0.5,
         output_segmentation_masks=False,
@@ -340,7 +341,23 @@ def main():
             alerta_activa = False
 
             if resultados.pose_landmarks:
-                landmarks = resultados.pose_landmarks[0]
+
+                # Buscar la persona que ocupa la mayor area (la mas cercana a la camara)
+                # para ignorar personas pasando por el fondo
+                mejor_indice = 0
+                max_area = 0
+                for idx, pose in enumerate(resultados.pose_landmarks):
+                    # Calculamos el area usando los puntos superiores (cabeza a cadera, aprox hasta 25)
+                    puntos = pose[:25]
+                    min_x = min(p.x for p in puntos)
+                    max_x = max(p.x for p in puntos)
+                    min_y = min(p.y for p in puntos)
+                    max_y = max(p.y for p in puntos)
+                    area = (max_x - min_x) * (max_y - min_y)
+                    if area > max_area:
+                        max_area = area
+                        mejor_indice = idx
+                landmarks = resultados.pose_landmarks[mejor_indice]
 
                 # coordenadas clave
                 nariz = normalizar_a_pixeles(landmarks[IDX_NARIZ], ancho_frame, alto_frame)

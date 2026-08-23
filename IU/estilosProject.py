@@ -320,3 +320,62 @@ QDialog{
             background:#2F6FE5;
         }
 '''
+botonSecion = '''
+QPushButton {
+    background-color: #2F5D46;
+    
+    border: 1px solid #579C77;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: bold;
+    
+    
+}
+
+QPushButton:hover {
+    background-color: #3B7155;
+    border: 1px solid #5A906F;
+    color: #FFFFFF;
+}
+
+QPushButton:pressed {
+    background-color: #274D3A;
+    border: 1px solid #477A5F;
+}
+
+QPushButton:disabled {
+    background-color: #34433B;
+    color: #7D8D84;
+    border: 1px solid #46564D;
+}
+'''
+
+botonAgregar = '''
+
+        QPushButton{
+        background-color: #23614a;
+        font-size: 15px;
+        font-weight: bold;
+        }
+        QPushButton:hover {
+        background-color: #3a8066;
+        }
+        QPushButton:pressed {
+        background-color: #3d9e7a;
+        }
+        '''
+botonCompletar = '''
+        QPushButton{
+        background-color: #9b9696;
+        font-size: 15px;
+        font-weight: bold;
+        }
+        QPushButton:hover {
+        background-color: #c2bbbb;
+        }
+        
+        QPushButton:pressed {
+        background-color: #9b9696;
+        }
+        '''

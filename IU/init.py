@@ -18,7 +18,7 @@ class PyVisionWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle(" ")
         self.setWindowIcon(QIcon("pictures/logoLab.svg"))
-        self.setMinimumSize(1170, 720)
+        self.setMinimumSize(1170, 750)
         self.setStyleSheet(estilo1)
 
         # Widget central

@@ -96,6 +96,7 @@ class WidDashboard(QWidget):
 
         widgetTiempos = QWidget()
         layoutTiempos = QHBoxLayout(widgetTiempos)
+        widgetTiempos.setMinimumHeight(90)
 
         frameTiempo1=QFrame()
         frameTiempo1.setStyleSheet('''
@@ -180,6 +181,7 @@ class WidDashboard(QWidget):
         layoutIconString1 = QHBoxLayout(widgetTiempo1)
         layoutIconString1.setContentsMargins(5, 0, 0, 5)
         layoutIconString1.setSpacing(6)
+
 
 
         icon1 = QSvgWidget("pictures/posturaBuena.svg")
@@ -305,8 +307,10 @@ class WidDashboard(QWidget):
         self.recordTxt2.setStyleSheet(contador1)
         self.recordTxt2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.botonPrueba = QPushButton("Iniciar dialogo")
+        self.botonPrueba = QPushButton("Iniciar Seccion")
         self.botonPrueba.clicked.connect(self.on_start_clicked)
+        self.setStyleSheet(botonSecion)
+
 
 
         layoutRecord.addSpacing(10)
@@ -328,9 +332,9 @@ class WidDashboard(QWidget):
         layoutDetect.addSpacing(4)
         layoutDetect.addWidget(frameRacha)
         layoutDetect.addSpacing(9)
-        layoutDetect.addWidget(frameRecord, alignment= Qt.AlignmentFlag.AlignLeft)
-        #layoutDetect.addSpacing(10)
-        layoutDetect.addStretch()
+        layoutDetect.addWidget(frameRecord)
+
+        layoutDetect.addSpacing(10)
         layoutDetect.addWidget(self.botonPrueba)
         #layoutDetect.addWidget(timeSeccionTxt)
         #layoutDetect.addWidget(self.visionButton, alignment= Qt.AlignmentFlag.AlignLeft)
@@ -471,34 +475,9 @@ QScrollArea > QWidget > QWidget {
         layoutBotones.setContentsMargins(15, 5, 19, 5)
 
         self.buttonAgregar = QPushButton("Agregar")
-        self.buttonAgregar.setStyleSheet('''
-        QPushButton{
-        background-color: #23614a;
-        font-size: 15px;
-        font-weight: bold;
-        }
-        QPushButton:hover {
-        background-color: #3a8066;
-        }
-        QPushButton:pressed {
-        background-color: #3d9e7a;
-        }
-        ''')
+        self.buttonAgregar.setStyleSheet(botonAgregar)
         self.buttonMarcar = QPushButton("Eliminar Completadas")
-        self.buttonMarcar.setStyleSheet('''
-        QPushButton{
-        background-color: #9b9696;
-        font-size: 15px;
-        font-weight: bold;
-        }
-        QPushButton:hover {
-        background-color: #c2bbbb;
-        }
-        
-        QPushButton:pressed {
-        background-color: #9b9696;
-        }
-        ''')
+        self.buttonMarcar.setStyleSheet(botonCompletar)
         layoutBotones.addWidget(self.buttonAgregar, stretch= 2)
         layoutBotones.addWidget(self.buttonMarcar, stretch= 3)
 
@@ -539,18 +518,14 @@ QScrollArea > QWidget > QWidget {
         self.buttonStart = QPushButton()
         self.buttonStart.setIcon(QIcon("pictures/play.svg"))
         self.buttonStart.setIconSize(QSize(21, 21))
+        self.buttonStart.setStyleSheet(botonSecion)
         #self.buttonStart.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         self.buttonStart.clicked.connect(self.accionBotonPomodoro)
 
         self.buttonRefresh = QPushButton()
         self.buttonRefresh.setIcon(QIcon("pictures/refresh.svg"))
         self.buttonRefresh.setIconSize(QSize(21, 21))
-        self.buttonRefresh.setStyleSheet('''
-        QPushButton::disabled {
-        background-color: black;
-        }
-        
-        ''')
+        self.buttonRefresh.setStyleSheet(botonSecion)
         #self.buttonRefresh.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         self.buttonRefresh.clicked.connect(self.accionBotonRefresh)
         self.buttonRefresh.setEnabled(False)
@@ -565,11 +540,11 @@ QScrollArea > QWidget > QWidget {
         layoutSelect = QHBoxLayout(SelectModeBar)
 
 
-        buttonMode = QPushButton(self)
-        buttonMode.setIcon(QIcon("pictures/menu.svg"))
-        buttonMode.setIconSize(QSize(19, 19))
-        buttonMode.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        buttonMode.setStyleSheet('''
+        self.buttonMode = QPushButton(self)
+        self.buttonMode.setIcon(QIcon("pictures/menu.svg"))
+        self.buttonMode.setIconSize(QSize(19, 19))
+        self.buttonMode.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        self.buttonMode.setStyleSheet('''
                 QPushButton{
                 background-color: #9b9696;
                 font-size: 15px;
@@ -632,8 +607,8 @@ QScrollArea > QWidget > QWidget {
             background-color: #5865F2;
         }
         """)
-        buttonMode.setMenu(self.selecMenu)
-        buttonMode.show()
+        self.buttonMode.setMenu(self.selecMenu)
+        self.buttonMode.show()
 
         self.ShowTimeWork = QFrame(self)
 
@@ -641,7 +616,7 @@ QScrollArea > QWidget > QWidget {
 
 
         layoutSelect.addWidget(self.modoTxt, stretch= 4)
-        layoutSelect.addWidget(buttonMode, stretch= 1)
+        layoutSelect.addWidget(self.buttonMode, stretch= 1)
 
         layoutPomodoro.addStretch()
         layoutPomodoro.addWidget(self.progressTime)
@@ -839,6 +814,7 @@ QScrollArea > QWidget > QWidget {
         self.vision_worker.frame_ready.connect(self._actualizar_camara)
         self.vision_worker.estado_actualizado.connect(self.procesar_estado)
         self.vision_worker.start()
+        self.buttonMode.setEnabled(False)
 
     def desactivar_camara(self):
         if self.vision_worker is None:
@@ -846,6 +822,7 @@ QScrollArea > QWidget > QWidget {
         self.vision_worker.stop()
         self.vision_worker = None
         self.contador_postura._ultimo_tiemestamp =None
+        self.buttonMode.setEnabled(True)
 
         self.mostrar_placeholder_camera()
 

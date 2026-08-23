@@ -55,7 +55,7 @@ class WidgetCirculo(QWidget):
         self.working = True
         self.total_seconds = self.workSeconds
         self.remaining_seconds = self.total_seconds * 1000
-        self.timer.stop()
+        #self.timer.stop()
         self.cambioFase.emit(self.working)
         self.update()
 

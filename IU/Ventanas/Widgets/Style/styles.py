@@ -27,7 +27,7 @@ def estilo_tarea_en_sesion() -> str:
     return f'''
     QFrame{{
         background-color: {Colores.FONDO_TARJETA};
-        border: 2px solid {Colores.BORDE_SESION};
+        border: 3px solid {Colores.BORDE_SESION};
         border-radius: 14px;
     }}
     QFrame::hover {{
