@@ -20,6 +20,10 @@ from PySide6.QtMultimedia import QSoundEffect
 from enum import Enum, auto
 
 
+from dataclasses import dataclass, field
+from datetime import datetime
+
+
 
 class EstadoApp(Enum):
     INACTIVO = auto()
@@ -37,7 +41,7 @@ class WidDashboard(QWidget):
 
         self.ciclosTerminados = 0
 
-        self._sonido_alerta = QSoundEffect()
+        self._sonido_alerta = QSoundEffect(self)
         base_path = os.path.dirname(os.path.abspath(__file__))
         ruta_wav = os.path.normpath(os.path.join(base_path, "..", "sounds", "errorSound.wav"))
         self._sonido_alerta.setSource(QUrl.fromLocalFile(ruta_wav))
@@ -46,9 +50,9 @@ class WidDashboard(QWidget):
 
         self._estado_anterior = None
 
-        self._sonido_ausencia = QSoundEffect()
+        self._sonido_ausencia = QSoundEffect(self)
         base_path_deteccion = os.path.dirname(os.path.abspath(__file__))
-        ruta_wav_2 = os.path.normpath(os.path.join(base_path_deteccion, "..", "sounds", "sinDeteccion2.wav"))
+        ruta_wav_2 = os.path.normpath(os.path.join(base_path_deteccion, "..", "sounds", "sindeteccion1.wav"))
         self._sonido_ausencia.setSource(QUrl.fromLocalFile(ruta_wav_2))
         self._sonido_ausencia.setLoopCount(-2)
         self._sonido_ausencia.setVolume(1)
@@ -725,6 +729,9 @@ QScrollArea > QWidget > QWidget {
     def _cambiar_estado(self, nuevo_estado: EstadoApp):
         self._estado_app = nuevo_estado
         print(f"Estado cambiado a: {nuevo_estado}")
+
+        if nuevo_estado == EstadoApp.EN_SESION:
+            self._sesion_fecha_inicio = datetime.now()
 
         self.buttonStart.setEnabled(nuevo_estado != EstadoApp.INACTIVO)
         self.buttonRefresh.setEnabled(nuevo_estado != EstadoApp.INACTIVO)

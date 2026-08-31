@@ -87,7 +87,7 @@ class PyVisionWindow(QMainWindow):
         #self.sidebarLayout.addSpacing(10)
         #self.sidebarLayout.addWidget(buttonConsejos)
         self.sidebarLayout.addStretch()
-        self.sidebarLayout.addWidget(buttonUsuarios)
+        #self.sidebarLayout.addWidget(buttonUsuarios)
         self.sidebarLayout.addWidget(buttonConfiguracion)
 
 

@@ -379,3 +379,32 @@ botonCompletar = '''
         background-color: #9b9696;
         }
         '''
+
+estadisticas = '''
+
+        
+        QFrame {
+        background-color: white;
+        border: 1px solid #4caf50;
+        border-radius: 12px;
+        } 
+        
+        QLabel {
+        background-color: transparent;
+        font-size: 14px;
+        font-weight: bold;
+        color: #d4d4d4;
+        border-color: transparent;
+        }
+
+
+
+        #Titulo {
+            background-color: transparent;
+            font-size: 40px;
+            font-weight: bold;
+            border-color: transparent;
+            border-radius: 12px;
+            }
+            
+'''
