@@ -83,6 +83,7 @@ class DonutPostura(QWidget):
 
         self.chart = QChart()
         self.chart.legend().setAlignment(Qt.AlignmentFlag.AlignBottom)
+        self.chart.legend().setLabelColor(QColor("white"))
         self.chart.setBackgroundVisible(False)
         self.chart.setMargins(self.chart.margins().__class__(0, 45, 0, 0))
         self.chart.layout().setContentsMargins(0, 0, 0, 0)
@@ -99,11 +100,16 @@ class DonutPostura(QWidget):
 
         self.pct_label = QLabel("--%")
         self.pct_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.pct_label.setStyleSheet("font-size: 26px; font-weight: 700; color: #2e7d32; background: transparent;")
+        self.pct_label.setStyleSheet("font-size: 26px; font-weight: 700; color: white; background: transparent;")
 
-        self.pct_sub_label = QLabel("buena postura")
+        self.pct_sub_label = QLabel("Buena Postura")
         self.pct_sub_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.pct_sub_label.setStyleSheet("font-size: 11px; color: #777; background: transparent;")
+        #self.pct_sub_label.setStyleSheet("font-size: 11px; color: #d4d4d4; background: transparent;")
+        self.pct_sub_label.setStyleSheet('''
+        QLabel {
+        color: white;
+        }
+        ''')
 
         overlay_layout.addWidget(self.pct_label)
         overlay_layout.addWidget(self.pct_sub_label)

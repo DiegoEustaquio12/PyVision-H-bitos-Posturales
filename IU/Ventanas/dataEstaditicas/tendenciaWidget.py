@@ -101,12 +101,14 @@ class TendenciaWidget(QWidget):
         eje_x = QBarCategoryAxis()
         eje_x.append(categorias)
         eje_x.setLabelsFont(self._fuente_pequena())
+        eje_x.setLabelsColor(QColor("white"))
 
         eje_y = QValueAxis()
         eje_y.setRange(0, 100)
         eje_y.setLabelFormat("%d%%")
         eje_y.setTickCount(6)
         eje_y.setLabelsFont(self._fuente_pequena())
+        eje_y.setLabelsColor(QColor("white"))
 
         self.chart.addAxis(eje_x, Qt.AlignmentFlag.AlignBottom)
         self.chart.addAxis(eje_y, Qt.AlignmentFlag.AlignLeft)

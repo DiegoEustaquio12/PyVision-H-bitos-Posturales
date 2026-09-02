@@ -143,7 +143,7 @@ class HeatmapActividad(QWidget):
         fuente.setBold(False)
         fuente.setPointSize(8)
         painter.setFont(fuente)
-        painter.setPen(QColor("#666666"))
+        painter.setPen(QColor("white"))
 
         mes_anterior = None
         for semana in range(num_semanas):
