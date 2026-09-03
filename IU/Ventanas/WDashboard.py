@@ -637,7 +637,7 @@ QScrollArea > QWidget > QWidget {
         right_layout.addWidget(bottom_widget, stretch=50)
 
         self._cambiar_estado(EstadoApp.INACTIVO)
-
+        self._camara_activa = False
 
     def txtPomodoro(self):
         self.progressTime.set_tiempos(30,15)
@@ -667,27 +667,7 @@ QScrollArea > QWidget > QWidget {
         self.buttonStart.setIconSize(QSize(21, 21))
         self.buttonRefresh.setEnabled(True)
 
-    def accionBotonPomodoro(self):
-        if self.progressTime.runningTime():
-            self.progressTime.pausar()
-            self.buttonRefresh.setEnabled(True)
-            self.buttonStart.setIcon(QIcon("pictures/play.svg"))
-            self.buttonStart.setIconSize(QSize(21, 21))
 
-            self.timerPausado = True
-
-            self.actualizar_estado_vision()
-
-
-        else:
-            self.progressTime.iniciar()
-            self.buttonRefresh.setEnabled(False)
-            self.buttonStart.setIcon(QIcon("pictures/stop.svg"))
-            self.buttonStart.setIconSize(QSize(21, 21))
-
-
-            self.timerPausado = False
-            self.actualizar_estado_vision()
 
     def accionBotonRefresh(self):
         self.progressTime.reiniciar()
@@ -705,6 +685,8 @@ QScrollArea > QWidget > QWidget {
             self.estatatusModo.setText("Descansando")
             self.modoTrabajo = False
 
+
+        print(f"[DEBUG] al_cambiar_fase -> working={working}, modoTrabajo={self.modoTrabajo}, timerPausado={self.timerPausado}")
         self.actualizar_estado_vision()
 
     def agregarSetTiempos(self):
@@ -783,6 +765,9 @@ QScrollArea > QWidget > QWidget {
             print("Sin Tareas terminadas")
 
     def _actualizar_camara(self, qimg):
+        if not self._camara_activa:
+            return
+
         self.labelCamara.setPixmap(
             QPixmap.fromImage(qimg).scaled(
                 self.labelCamara.size(),
@@ -809,12 +794,36 @@ QScrollArea > QWidget > QWidget {
         """)
         #self.procesar_estado(estado)
 
+    def _iniciar_temporizador(self):
+        self.progressTime.iniciar()
+        self.buttonRefresh.setEnabled(False)
+        self.buttonStart.setIcon(QIcon("pictures/stop.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.timerPausado = False
+        self.actualizar_estado_vision()
+
+    def _pausar_temporizador(self):
+        self.progressTime.pausar()
+        self.buttonRefresh.setEnabled(True)
+        self.buttonStart.setIcon(QIcon("pictures/play.svg"))
+        self.buttonStart.setIconSize(QSize(21, 21))
+        self.timerPausado = True
+        self.actualizar_estado_vision()
+
+    def accionBotonPomodoro(self):
+        if self.progressTime.runningTime():
+            self._pausar_temporizador()
+        else:
+            self._iniciar_temporizador()
+
 
 
 
     def activar_vision(self):
         if self.vision_worker is not None:
             return
+
+        self._camara_activa = True
 
         visonAdapter.iniciar_vision()
         self.vision_worker = VisionWorker()
@@ -823,15 +832,7 @@ QScrollArea > QWidget > QWidget {
         self.vision_worker.start()
         self.buttonMode.setEnabled(False)
 
-    def desactivar_camara(self):
-        if self.vision_worker is None:
-            return
-        self.vision_worker.stop()
-        self.vision_worker = None
-        self.contador_postura._ultimo_tiemestamp =None
-        self.buttonMode.setEnabled(True)
 
-        self.mostrar_placeholder_camera()
 
     def procesar_estado(self, estado):
         #actualizare el pill
@@ -900,15 +901,7 @@ QScrollArea > QWidget > QWidget {
         self._sonido_ausencia.stop()
         self._sonido_alerta.stop()
 
-    def actualizar_estado_vision(self):
-        debePrender = (self.modoTrabajo == True) and not self.timerPausado
 
-        if debePrender and self.vision_worker is None:
-            self.activar_vision()
-            print("Vision Activa")
-        elif not debePrender and self.vision_worker is not None:
-            self.desactivar_camara()
-            print("Vision Desactivada")
 
     def obtener_tareas_pendientes(self) -> list[tuple[int, str]]:
         return [(t.id_tarea, t.trabajoLabel.text()) for t in self.listaTareas if not t.completada]
@@ -933,7 +926,6 @@ QScrollArea > QWidget > QWidget {
         self._sesion_pendientes.clear()
         self._cambiar_estado(EstadoApp.INACTIVO)
 
-
     def on_start_clicked(self):
         pendientes = self.obtener_tareas_pendientes()
         dialogo = dialogSelectTask(pendientes, parent=self)
@@ -949,7 +941,7 @@ QScrollArea > QWidget > QWidget {
             print(f"inicio de seccion{ids_seleccionados}")
 
         if self._estado_app == EstadoApp.INACTIVO:
-            #self.activar_vision()
+            self.activar_vision()
             print("se prende vision")
             if ids_seleccionados:
                 self.iniciar_sesion(ids_seleccionados)
@@ -961,9 +953,33 @@ QScrollArea > QWidget > QWidget {
             if ids_seleccionados:
                 self.iniciar_sesion(ids_seleccionados)
                 self._cambiar_estado(EstadoApp.EN_SESION)
-                #por si elige "sin asignaciones" estando ya libre no hay cambio
 
-        self.iniciar_sesion(ids_seleccionados)
+        self._iniciar_temporizador()  # ← arranca el timer al final, una sola vez
+
+    def _detener_worker_camara(self):
+        """Apaga el worker de visión sin tocar _estado_app (para uso interno/pausa)."""
+        if self.vision_worker is None:
+            return
+        self._camara_activa = False
+        self.vision_worker.stop()
+        self.vision_worker = None
+        self.contador_postura._ultimo_tiemestamp = None
+        self.mostrar_placeholder_camera()
+
+    def desactivar_camara(self):
+        """Apaga la cámara Y marca la app como inactiva (fin de sesión real)."""
+        self._detener_worker_camara()
+        self._estado_app = EstadoApp.INACTIVO
+        self.buttonMode.setEnabled(True)
+
+    def actualizar_estado_vision(self):
+        debePrender = (self.modoTrabajo == True) and not self.timerPausado
+        if debePrender and self.vision_worker is None:
+            self.activar_vision()
+        elif not debePrender and self.vision_worker is not None:
+            self._detener_worker_camara()  # ← sin tocar _estado_app
+
+
 
 
 

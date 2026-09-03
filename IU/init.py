@@ -11,6 +11,7 @@ from IU.Ventanas.WObjetivos import WidObjetivos
 from IU.Ventanas.WConsejos import WidConsejos
 from IU.Ventanas.WUsers import WidUsers
 from IU.Ventanas.WConfig import WidConfiguracion
+from IU.Ventanas.Widgets.structureTime import ContadorPostura
 
 
 class PyVisionWindow(QMainWindow):
@@ -98,10 +99,12 @@ class PyVisionWindow(QMainWindow):
         # --- Contenido derecho: vertical (frame2 arriba | frames 3+4 abajo) ---
 
         self.pilaFrames = QStackedWidget(ObjectName = "pila")
+        self.contador_postura = ContadorPostura()
 
 
         self.ventanaDashboard = WidDashboard()
         self.ventanaEstadisticas = WidEstadisticas()
+        self.ventanaEstadisticas.set_contador_postura(self.ventanaDashboard.contador_postura)
         self.ventanaObjetivos = WidObjetivos()
         self.ventanaConsejos = WidConsejos()
         self.ventanaUsuarios = WidUsers()

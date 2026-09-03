@@ -52,11 +52,11 @@ class WidgetCirculo(QWidget):
         """Se llama desde el QMenu al elegir una opción (Pomodoro/Enfoque/Predeterminado)."""
         self.workSeconds = work_seconds
         self.restSeconds = rest_seconds
-        self.working = True
+        #self.working = True
         self.total_seconds = self.workSeconds
         self.remaining_seconds = self.total_seconds * 1000
         #self.timer.stop()
-        self.cambioFase.emit(self.working)
+        #self.cambioFase.emit(self.working)
         self.update()
 
     def alternarFase(self):
