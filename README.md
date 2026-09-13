@@ -1,5 +1,5 @@
 #  PyVision: Corrección de Postura Inteligente
-> **Tu asistente personal de ergonomía basado en Visión por Computadora.** 🚀
+> **Tu asistente personal de ergonomía basado en Visión por Computadora.** 
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
 [![MediaPipe](https://img.shields.io/badge/MediaPipe-OpenCV-green.svg?style=for-the-badge&logo=google&logoColor=white)](https://google.github.io/mediapipe/)
@@ -16,7 +16,7 @@ A diferencia de los costosos muebles ergonómicos o los incómodos correctores f
 
 ---
 
-## 🎨 Interfaz de Usuario (Preview)
+## Interfaz de Usuario (Preview)
 
 El sistema cuenta con un moderno dashboard oscuro diseñado en **PySide** que integra todas las herramientas necesarias para equilibrar salud y productividad:
 
@@ -28,7 +28,7 @@ El sistema cuenta con un moderno dashboard oscuro diseñado en **PySide** que in
 ---
 
 
-## 📊 Problemática y Justificación Ergonómica
+## Problemática y Justificación Ergonómica
 
 En México, entre el **25% y el 30% de la población ocupada** trabaja frente a una computadora, mientras que más del **85% de los estudiantes universitarios** la utilizan entre 4 y 5 horas diarias sin hábitos posturales adecuados. 
 
@@ -78,7 +78,7 @@ PyVision está directamente vinculado con el **ODS 3: Salud y Bienestar** de la 
 
 ---
 
-## 👥 Desarrolladores (BUAP)
+##  Desarrolladores (BUAP)
 
 Este proyecto es desarrollado de forma colaborativa en la **Facultad de Ciencias de la Computación** de la **Benemérita Universidad Autónoma de Puebla** (Licenciatura en Ingeniería en Ciencias de la Computación):
 
