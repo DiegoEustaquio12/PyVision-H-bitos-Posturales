@@ -88,4 +88,4 @@ Este proyecto es desarrollado de forma colaborativa en la **Facultad de Ciencias
 * **Torres González M.**
 
 ---
-*Facultad de Ciencias de la Computación, BUAP — Mayo 2026*
+*Facultad de Ciencias de la Computación, BUAP — 2026*
